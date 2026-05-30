@@ -1,0 +1,2 @@
+{"event_id": "e6ab72de-37f5-4278-9faf-1cbdc52608c7", "store_id": "STORE_E2E_01", "visitor_id": "VIS_002", "event_type": "BILLING_QUEUE_JOIN", "timestamp": "2026-05-30T12:27:50.852588+00:00", "confidence": 0.4105, "camera_id": "CAM_BILLING_01"}
+{"event_id": "9561d274-53ee-482d-9b66-f1dd11fa527f", "store_id": "STORE_E2E_01", "visitor_id": "VIS_003", "event_type": "BILLING_QUEUE_JOIN", "timestamp": "2026-05-30T12:27:52.894098+00:00", "confidence": 0.3275, "camera_id": "CAM_BILLING_01"}

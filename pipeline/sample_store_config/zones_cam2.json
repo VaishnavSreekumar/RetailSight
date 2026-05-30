@@ -1,0 +1,7 @@
+{
+  "entry_zone": [],
+  "billing_zone": [],
+  "retail_zones": {
+    "SKINCARE": [[0, 0], [1920, 0], [1920, 1080], [0, 1080]]
+  }
+}

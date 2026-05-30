@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv
+venv/
+ENV/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+*.swp
+*.swo
+# CCTV datasets
+CCTV Footage/
+*.mp4
+*.avi
+*.mov
+
+# Generated outputs
+*.jsonl
+outputs/
