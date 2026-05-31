@@ -20,41 +20,41 @@ graph TD
     classDef dbStyle fill:#fff3e0,stroke:#fb8c00,stroke-width:2px;
     classDef outStyle fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
 
-    subgraph Edge ["📹 In-Store Edge (Computer Vision)"]
-        A["🎥 CCTV Camera Feeds"] --> B["🧠 YOLOv8 & ByteTrack<br>(Detects & Tracks People)"]
-        B --> C["📐 Zone Engine (Shapely)<br>(Evaluates Coordinates against Skincare/Queue Polygons)"]
-        C --> D["⚡ Event Generator<br>(Emits Entry/Exit/Dwell Telemetry Events)"]
+    subgraph Edge ["In-Store Edge (Computer Vision)"]
+        A["CCTV Camera Feeds"] --> B["YOLOv8 & ByteTrack<br>(Detects and Tracks People)"]
+        B --> C["Zone Engine (Shapely)<br>(Evaluates Coordinates against Skincare/Queue Polygons)"]
+        C --> D["Event Generator<br>(Emits Entry/Exit/Dwell Telemetry Events)"]
     end
 
-    subgraph Ingestion ["🚀 Backend Ingestion & API Layer"]
-        D -->|HTTP POST| E["📥 /events/ingest Ingestor"]
+    subgraph Ingestion ["Backend Ingestion and API Layer"]
+        D -->|HTTP POST| E["/events/ingest Ingestor"]
     end
 
-    subgraph Database ["💾 Database Layer (PostgreSQL)"]
-        E -->|Store Raw Events| F[("📊 'event' Table<br>(Camera events & coords)")]
-        H[("💰 'brigade_transactions' Table<br>(POS transaction items)")]
-        G[("👥 'visitor_session' Table<br>(Stitched journeys & dwell times)")]
+    subgraph Database ["Database Layer (PostgreSQL)"]
+        E -->|Store Raw Events| F[("event Table<br>(Camera events and coordinates)")]
+        H[("brigade_transactions Table<br>(POS transaction items)")]
+        G[("visitor_session Table<br>(Stitched journeys and dwell times)")]
     end
 
-    subgraph Hydration ["⚙️ Session Hydration & POS Matching"]
-        I["🔄 Session Hydration Service"]
+    subgraph Hydration ["Session Hydration and POS Matching"]
+        I["Session Hydration Service"]
         F -->|Read Raw Events| I
         I -->|Group by visitor and stitch paths| G
         
-        J["🤝 Transaction Matcher<br>(Greedy Proximity Attributor)"]
+        J["Transaction Matcher<br>(Greedy Proximity Attributor)"]
         G --> J
         H -->|Correlate store checkouts| J
-        J -->|Link conversions & update DB| G
+        J -->|Link conversions and update DB| G
     end
 
-    subgraph Insights ["📊 Business Intelligence Value Layer"]
-        G --> K["📈 API Analytics Endpoints"]
-        K --> K1["📊 /metrics<br>(Store traffic & conversion %)"]
-        K --> K2["💼 /executive-dashboard<br>(NMV, brand sales, salesperson rank)"]
-        K --> K3["🚶 /shopper-behavior<br>(Dwell correlation, queue loss)"]
+    subgraph Insights ["Business Intelligence Value Layer"]
+        G --> K["API Analytics Endpoints"]
+        K --> K1["/metrics<br>(Store traffic and conversion %)"]
+        K --> K2["/executive-dashboard<br>(NMV, brand sales, salesperson rank)"]
+        K --> K3["/shopper-behavior<br>(Dwell correlation, queue loss)"]
     end
 
-    CSV["🛒 Brigade Road POS Dataset (CSV)"] -->|Data Loader Script| H
+    CSV["Brigade Road POS Dataset (CSV)"] -->|Data Loader Script| H
 
     %% Class Assignments
     class A,B,C,D edgeStyle;
