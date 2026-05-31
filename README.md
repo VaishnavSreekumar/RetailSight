@@ -12,6 +12,57 @@ Physical retail store managers have historically lacked the precise, cohort-leve
 
 ## 2. System Architecture
 
+```mermaid
+graph TD
+    %% Styling
+    classDef edgeStyle fill:#e1f5fe,stroke:#039be5,stroke-width:2px;
+    classDef apiStyle fill:#e8f5e9,stroke:#43a047,stroke-width:2px;
+    classDef dbStyle fill:#fff3e0,stroke:#fb8c00,stroke-width:2px;
+    classDef outStyle fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
+
+    subgraph Edge ["📹 In-Store Edge (Computer Vision)"]
+        A["🎥 CCTV Camera Feeds"] --> B["🧠 YOLOv8 & ByteTrack<br>(Detects & Tracks People)"]
+        B --> C["📐 Zone Engine (Shapely)<br>(Evaluates Coordinates against Skincare/Queue Polygons)"]
+        C --> D["⚡ Event Generator<br>(Emits Entry/Exit/Dwell Telemetry Events)"]
+    end
+
+    subgraph Ingestion ["🚀 Backend Ingestion & API Layer"]
+        D -->|HTTP POST| E["📥 /events/ingest Ingestor"]
+    end
+
+    subgraph Database ["💾 Database Layer (PostgreSQL)"]
+        E -->|Store Raw Events| F[("📊 'event' Table<br>(Camera events & coords)")]
+        H[("💰 'brigade_transactions' Table<br>(POS transaction items)")]
+        G[("👥 'visitor_session' Table<br>(Stitched journeys & dwell times)")]
+    end
+
+    subgraph Hydration ["⚙️ Session Hydration & POS Matching"]
+        I["🔄 Session Hydration Service"]
+        F -->|Read Raw Events| I
+        I -->|Group by visitor and stitch paths| G
+        
+        J["🤝 Transaction Matcher<br>(Greedy Proximity Attributor)"]
+        G --> J
+        H -->|Correlate store checkouts| J
+        J -->|Link conversions & update DB| G
+    end
+
+    subgraph Insights ["📊 Business Intelligence Value Layer"]
+        G --> K["📈 API Analytics Endpoints"]
+        K --> K1["📊 /metrics<br>(Store traffic & conversion %)"]
+        K --> K2["💼 /executive-dashboard<br>(NMV, brand sales, salesperson rank)"]
+        K --> K3["🚶 /shopper-behavior<br>(Dwell correlation, queue loss)"]
+    end
+
+    CSV["🛒 Brigade Road POS Dataset (CSV)"] -->|Data Loader Script| H
+
+    %% Class Assignments
+    class A,B,C,D edgeStyle;
+    class E,I,J,K,K1,K2,K3 apiStyle;
+    class F,G,H dbStyle;
+    class CSV outStyle;
+```
+
 The platform is divided into two decoupled subsystems:
 
 ### A. Edge Computer Vision Pipeline
