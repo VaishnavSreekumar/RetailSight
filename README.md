@@ -303,11 +303,11 @@ $env:PYTHONPATH="."
 
 ---
 
-## 8. Screenshots & Visualizations
+## 8. Store Layout Intelligence
 
-*(Placeholders for future frontend integration)*
-* **Overview Analytics**: Visualizes total foot traffic, conversion trend curves, and active store alerts.
-* **Spatial Dwell Heatmaps**: SVG polygons representing the skincare aisle, entry corridor, and checkout counter overlaid directly onto static camera snapshots. Color scales (Cool blue to Warm red) indicate visitor dwell averages.
+The Brigade Road store layout was mapped into business sections and linked to CCTV visitor journeys and POS transactions.
+
+![Store Layout Intelligence](docs/layout_assets/brigade_layout_intelligence.png)
 
 ---
 
