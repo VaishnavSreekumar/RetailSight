@@ -9,6 +9,7 @@ from app.models.brigade_transaction import BrigadeTransaction
 from app.models.visitor_session import VisitorSession
 from app.models.event import Event, EventType
 from app.config import BRAND_TO_SECTION_MAPPING_PATH
+from app.services.conversion_engine import ConversionEngine
 from app.schemas.shopper_behavior import (
     ShopperBehaviorReport, SectionBehaviorMetrics, OpportunityZone,
     CheckoutIntelligence, BehaviorInsights
@@ -35,8 +36,6 @@ class ShopperBehaviorService:
         df_purchases = pd.merge(df_trans, df_mapping[['brand_name', 'section']], on='brand_name', how='left')
         
         # 2. Get CCTV Data (Sessions & Events)
-        # NOTE: These tables are not populated by a live pipeline in this project.
-        # The queries will return empty results.
         sessions_result = await self.db.execute(select(VisitorSession).where(VisitorSession.store_id == str(store_id)))
         sessions = sessions_result.scalars().all()
         
@@ -61,10 +60,34 @@ class ShopperBehaviorService:
         # Purchase counts per section from real data
         purchase_counts = df_purchases.groupby('section')['order_id'].nunique().to_dict()
 
-        # Visitor counts and dwell times would come from CCTV data (events/sessions).
-        # Since this data is not available, these will be 0.
-        visitor_counts = {} # Placeholder
-        dwell_times = {}    # Placeholder
+        # Compute zone metrics from visitor sessions
+        zone_effectiveness = ConversionEngine.calculate_zone_effectiveness(sessions)
+
+        def map_zone_to_section(zone_name: str) -> str:
+            name = zone_name.upper().replace("ZONE_", "").strip()
+            if "SKINCARE" in name or "SKIN" in name:
+                return "SKINCARE_WALL"
+            if "MAKEUP" in name or "COSMETICS" in name:
+                return "MAKEUP_WALL"
+            if "CENTRAL" in name:
+                return "CENTRAL_DISPLAY"
+            if "PMU" in name:
+                return "PMU_SECTION"
+            return zone_name
+
+        visitor_counts = {}
+        dwell_sums = {}
+
+        for zone_id, stats in zone_effectiveness.items():
+            section = map_zone_to_section(zone_id)
+            visitor_counts[section] = visitor_counts.get(section, 0) + stats["visitors_count"]
+            dwell_sums[section] = dwell_sums.get(section, 0.0) + (stats["average_dwell_ms"] * stats["visitors_count"])
+
+        # Average dwell times per section (weighted by visitor counts)
+        dwell_times = {}
+        for section, total_dwell_ms in dwell_sums.items():
+            visitors_in_section = visitor_counts.get(section, 0)
+            dwell_times[section] = (total_dwell_ms / visitors_in_section / 1000.0) if visitors_in_section > 0 else 0.0
 
         all_sections = set(purchase_counts.keys()) | set(visitor_counts.keys())
         
@@ -76,7 +99,7 @@ class ShopperBehaviorService:
             metrics.append(SectionBehaviorMetrics(
                 section_name=section,
                 visitor_count=visitors,
-                avg_dwell_seconds=dwell_times.get(section, 0.0),
+                avg_dwell_seconds=round(dwell_times.get(section, 0.0), 2),
                 purchase_count=purchases,
                 conversion_rate=purchases / visitors if visitors > 0 else 0.0
             ))
@@ -85,14 +108,19 @@ class ShopperBehaviorService:
     def _identify_opportunity_zones(self, section_metrics: List[SectionBehaviorMetrics]) -> List[OpportunityZone]:
         """
         Identifies sections with high dwell time but low conversion.
-        NOTE: Cannot function without real dwell and conversion data.
         """
         if not section_metrics:
             return []
             
-        # Calculation is impossible without real visitor and dwell data.
-        # This function will return an empty list.
-        return []
+        opportunity_zones = []
+        for m in section_metrics:
+            # Threshold: average dwell > 15s and conversion rate < 25% (0.25)
+            if m.visitor_count > 0 and m.avg_dwell_seconds > 15.0 and m.conversion_rate < 0.25:
+                opportunity_zones.append(OpportunityZone(
+                    section_name=m.section_name,
+                    recommendation=f"High interest ({m.avg_dwell_seconds:.1f}s avg dwell) but low conversion ({m.conversion_rate * 100:.1f}%). Optimize visual merchandising, product placement, or staff assistance."
+                ))
+        return opportunity_zones
 
     def _calculate_checkout_intelligence(self, df_purchases: pd.DataFrame, events: List[Event]) -> CheckoutIntelligence:
         """

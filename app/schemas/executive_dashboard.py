@@ -32,12 +32,7 @@ class LayoutInsights(BaseModel):
     lowest_revenue_section: str
     highest_abv_section: str
 
-class BehaviorInsights(BaseModel):
-    average_session_length: float
-    pages_per_session: float
-    bounce_rate: float
-    conversion_rate: float
-    top_pages: List[str]
+from .shopper_behavior import BehaviorInsights
 
 class ExecutiveDashboard(BaseModel):
     revenue: RevenueMetrics
@@ -46,7 +41,4 @@ class ExecutiveDashboard(BaseModel):
     top_salespeople: List[SalespersonMetrics]
     customer_behavior: Optional[CustomerBehavior]
     layout_insights: LayoutInsights
-    behavior_insights: Optional['BehaviorInsights'] = None
-
-from .shopper_behavior import BehaviorInsights
-ExecutiveDashboard.model_rebuild()
+    behavior_insights: Optional[BehaviorInsights] = None

@@ -66,8 +66,8 @@ def create_app() -> FastAPI:
         service = ExecutiveDashboardService(db)
         dashboard_data = await service.get_dashboard_data("STORE_VAL_01")
         behavior_service = ShopperBehaviorService(db)
-        dashboard_data.behavior_insights = await behavior_service.get_behavior_insights_for_dashboard("STORE_VAL_01")
-        return dashboard_data
+        insights = await behavior_service.get_behavior_insights_for_dashboard("STORE_VAL_01")
+        return dashboard_data.model_copy(update={"behavior_insights": insights})
 
     @app.get("/shopper-behavior")
     async def get_root_shopper_behavior(db=Depends(get_db)):

@@ -63,9 +63,9 @@ async def get_executive_dashboard(
     dashboard_data = await service.get_dashboard_data(store_id)
 
     behavior_service = ShopperBehaviorService(db)
-    dashboard_data.behavior_insights = await behavior_service.get_behavior_insights_for_dashboard(store_id)
+    insights = await behavior_service.get_behavior_insights_for_dashboard(store_id)
 
-    return dashboard_data
+    return dashboard_data.model_copy(update={"behavior_insights": insights})
 
 
 @router.get(
