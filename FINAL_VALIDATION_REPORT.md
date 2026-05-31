@@ -230,3 +230,30 @@ tests\test_transaction_matcher.py ...                                    [100%]
 - **Physical-to-Digital Receipt Matching**: Linking a physical shopper's session to a POS transaction relies on temporal proximity (session exit time matching receipt timestamp within ±5 minutes). If multiple shoppers exit at similar times and purchase, receipt linkage contains potential ambiguity.
 - **Lack of Real Billing Video for CAM 1**: In `zones_cam1.json`, the entry camera has no field of view covering the billing queue (`billing_zone: []`). Billing queue statistics must be simulated or sourced from other camera configuration files (like CAM 4).
 - **Store ID Discrepancy**: The Brigade CSV dataset names the store `'ST1008'` but the database stores `store_id` as an `Integer` (1008) or a formatted string like `'STORE_VAL_01'` for CCTV. The insights service maps `'ST1008'` to `1008` dynamically.
+
+---
+
+## 11. Reproducibility Verification
+
+The project was validated from a fresh Git clone in a separate workspace.
+
+Validation steps:
+
+```bash
+git clone <repository>
+docker compose up -d --build
+docker compose exec web alembic upgrade head
+docker compose exec web python data/load_brigade_transactions.py
+docker compose exec web python pipeline/run_cctv_validation.py
+```
+
+The validation produced:
+
+* 336 generated events
+* 68 hydrated visitor sessions
+* Successful API responses from `/metrics`, `/executive-dashboard`, and `/shopper-behavior`
+
+A separate clean-clone environment was used to verify that all required files, migrations, and datasets were available and reproducible.
+
+Repository URL: https://github.com/VaishnavSreekumar/RetailSight
+
