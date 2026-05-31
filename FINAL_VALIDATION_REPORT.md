@@ -240,7 +240,7 @@ The project was validated from a fresh Git clone in a separate workspace.
 Validation steps:
 
 ```bash
-git clone <repository>
+git clone https://github.com/VaishnavSreekumar/RetailSight
 docker compose up -d --build
 docker compose exec web alembic upgrade head
 docker compose exec web python data/load_brigade_transactions.py
