@@ -159,3 +159,36 @@ Resolves multi-camera track fragmentation by stitching camera-local track IDs in
   * Reconstructs 22 global visitor paths with an average of 2.0 camera track fragments stitched per visitor.
 * **Test Coverage**:
   * `tests/test_correlation.py`: Tests track parsing, camera name normalization, transition rules (Rules 1-4), topological constraints, and `/correlations` REST route.
+
+---
+
+## 8. Business Insights & Retail Commerce
+Leverages the **real Brigade Road, Bangalore transaction dataset** to generate strongly typed retail analytics and correlate physical in-store paths with cashier purchases.
+
+* **Files Involved**:
+  * [app/analytics/data_profiler.py](file:///c:/Users/vaish/retail-intelligence/app/analytics/data_profiler.py): Automates dataset profiling.
+  * [app/services/retail_insights_service.py](file:///c:/Users/vaish/retail-intelligence/app/services/retail_insights_service.py): Calculates standard retail revenue, product, offer, and employee KPIs.
+  * [app/services/journey_commerce_service.py](file:///c:/Users/vaish/retail-intelligence/app/services/journey_commerce_service.py): Stitches physical zone dwells with transaction shopping baskets.
+  * [app/schemas/insights.py](file:///c:/Users/vaish/retail-intelligence/app/schemas/insights.py): Strongly typed validation models for insights responses.
+  * [app/api/v1/endpoints/stores.py](file:///c:/Users/vaish/retail-intelligence/app/api/v1/endpoints/stores.py): Exposes 5 REST routes under `/stores/{store_id}/insights/*` and `/executive-summary`.
+* **Verification Evidence**:
+  * Profiling verified **101 transaction rows**, ₹34,831.74 total Net Merchandise Value, and ₹1,451.32 Average Basket Value.
+  * `GET /api/v1/stores/ST1008/executive-summary` returns:
+    ```json
+    {
+      "revenue": 34831.74,
+      "top_category": "makeup",
+      "top_brand": "Faces Canada",
+      "best_offer": "Buy 2 Get 1 Faces and Ny bae",
+      "top_salesperson": "Zufishan Khazra",
+      "conversion_rate": 38.46,
+      "highest_performing_zone": "ZONE_COSMETICS",
+      "opportunity_zone": "ZONE_SKINCARE"
+    }
+    ```
+* **Test Coverage**:
+  * `tests/test_retail_insights_service.py`: Validates revenue totals, product category lists, applied campaign rates, and salesperson totals.
+  * `tests/test_journey_commerce_service.py`: Audits dwell-to-purchase percentages, checkout abandonment values, and opportunity loss severity.
+  * `tests/test_executive_summary_endpoint.py`: Validates all five REST routes under client mock routing.
+  * **Test Suite passes 59/59 successfully!**
+

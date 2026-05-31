@@ -1,5 +1,14 @@
 from typing import Any, Sequence
 
+# ---------------------------------------------------------------------------
+# Metric contracts
+# ---------------------------------------------------------------------------
+# conversion_rate   : percentage, range [0.0, 100.0]  — e.g. 38.46 means 38.46 %
+# abandonment_rate  : fraction,   range [0.0, 1.0]    — e.g. 0.33  means 33 %
+# All intermediate boolean flags (has_converted, has_joined_billing_queue)
+# originate from the visitor_sessions table populated by the CCTV pipeline.
+# ---------------------------------------------------------------------------
+
 # Helper to retrieve attributes from either objects or dicts
 def _get_field(obj: Any, attr: str, default: Any = None) -> Any:
     if isinstance(obj, dict):
@@ -42,6 +51,8 @@ class ConversionEngine:
             if _get_field(session, "has_converted", False):
                 purchases += 1
 
+        # Formula: conversion_rate = (purchases / total_entries) * 100
+        # Output contract: percentage in range [0.0, 100.0]
         conversion_rate = round((purchases / entries) * 100, 2)
         avg_journey_length = round(total_journey_length / entries, 2)
 

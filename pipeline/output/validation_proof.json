@@ -1,0 +1,244 @@
+{
+  "proof_generated_at": "2026-05-31T12:40:39.420056+00:00",
+  "store_id": "STORE_VAL_01",
+  "camera_id": "CAM_ENTRY_01",
+  "video_file": "C:\\Users\\vaish\\retail-intelligence\\CCTV Footage\\CAM 1.mp4",
+  "frames_processed": 4193,
+  "step_1_video_to_events": {
+    "description": "Real YOLOv8n tracker ran on actual MP4 frames. EventGenerator state machine converted tracks to events.",
+    "total_events_generated": 336,
+    "unique_visitor_ids": 68,
+    "event_types": {
+      "ENTRY": 68,
+      "EXIT": 63,
+      "ZONE_DWELL": 111,
+      "ZONE_ENTER": 49,
+      "ZONE_EXIT": 45
+    }
+  },
+  "step_2_events_ingested": {
+    "description": "POST /api/v1/events/ingest",
+    "api_response": {
+      "ingested_count": 0,
+      "duplicate_count": 336,
+      "failed_count": 0,
+      "errors": []
+    }
+  },
+  "step_3_sessions_hydrated": {
+    "description": "POST /api/v1/stores/{store_id}/hydrate \u2014 SessionHydrationService aggregates events into VisitorSession rows.",
+    "api_response": {
+      "hydrated_count": 68,
+      "linked_count": 0
+    }
+  },
+  "step_4_dashboard_metrics": {
+    "description": "GET /api/v1/stores/{store_id}/metrics \u2014 All counts sourced from visitor_sessions table.",
+    "formula_visitor_count": "SELECT COUNT(*) FROM visitor_sessions WHERE store_id = :store_id",
+    "formula_purchase_count": "SELECT COUNT(*) FROM visitor_sessions WHERE store_id = :store_id AND has_converted = TRUE",
+    "formula_queue_entries": "SELECT COUNT(*) FROM visitor_sessions WHERE store_id = :store_id AND has_joined_billing_queue = TRUE",
+    "formula_conversion_rate": "(purchase_count / visitor_count) * 100  \u2192 percentage [0, 100]",
+    "formula_abandonment_rate": "((queue_entries - purchases) / queue_entries)  \u2192 fraction [0, 1]",
+    "live_metrics": {
+      "store_id": "STORE_VAL_01",
+      "visitors": 68,
+      "engaged_visitors": 45,
+      "billing_queue_visitors": 0,
+      "purchases": 0,
+      "conversion_rate": 0.0,
+      "avg_session_dwell_ms": 6582.31,
+      "avg_journey_length": 0.66,
+      "avg_zones_visited": 0.66,
+      "opportunity_zones": [],
+      "generated_at": "2026-05-31T12:40:39.150735Z"
+    }
+  },
+  "step_5_single_visitor_proof": {
+    "description": "Full chain for visitor VIS_001",
+    "visitor_id": "VIS_001",
+    "raw_events_from_video": [
+      {
+        "event_id": "f8263842-e301-5274-b434-b8ada36c5228",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ENTRY",
+        "timestamp": "2026-05-31T12:00:00+00:00",
+        "confidence": 0.8384,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "06bad285-91ab-5e52-b845-e60fa6ed7e10",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_ENTER",
+        "timestamp": "2026-05-31T12:00:00.300300+00:00",
+        "confidence": 0.841,
+        "zone_id": "SKINCARE",
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "b51c796b-e4ab-5aac-9f04-cc55eba98ec5",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:05.305300+00:00",
+        "confidence": 0.8008,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "0eb683ec-dcbe-5938-ae06-2a30728119ac",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:10.310300+00:00",
+        "confidence": 0.7951,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "1bb74c9b-770a-570d-a111-554fd720168c",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:15.315300+00:00",
+        "confidence": 0.7956,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "fdfda8de-ca99-5ce3-b5a7-0d6934c30943",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:20.320300+00:00",
+        "confidence": 0.7895,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "444dc829-9ad8-5415-a494-d8c170042b30",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:25.325300+00:00",
+        "confidence": 0.7854,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "2b3f027c-2242-57ac-b2f4-64be6b58b788",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:30.330300+00:00",
+        "confidence": 0.7865,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "baf7f329-fd6b-5c10-b830-137bb0619136",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:35.335300+00:00",
+        "confidence": 0.7849,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "b1cc1b95-51f6-5f6d-ae82-09a74900934b",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:40.340300+00:00",
+        "confidence": 0.7764,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "f16955cf-a076-5611-a294-3352fed138e2",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:45.345300+00:00",
+        "confidence": 0.7709,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "ff4f4331-ab60-5067-88cc-2f4747d8b486",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:50.350300+00:00",
+        "confidence": 0.7651,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 5005,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "66b344c8-ea10-51bc-8619-bb3c7dfcd805",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_EXIT",
+        "timestamp": "2026-05-31T12:00:51.251200+00:00",
+        "confidence": 0.7633,
+        "zone_id": "SKINCARE",
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "3aff67b5-9687-5c6c-bc64-d20cc5bb375a",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "ZONE_DWELL",
+        "timestamp": "2026-05-31T12:00:51.251200+00:00",
+        "confidence": 0.7633,
+        "zone_id": "SKINCARE",
+        "dwell_ms": 900,
+        "camera_id": "CAM_ENTRY_01"
+      },
+      {
+        "event_id": "9702974d-e0d3-54d8-9e4f-33e634544d27",
+        "store_id": "STORE_VAL_01",
+        "visitor_id": "VIS_001",
+        "event_type": "EXIT",
+        "timestamp": "2026-05-31T12:00:51.251200+00:00",
+        "confidence": 0.7633,
+        "camera_id": "CAM_ENTRY_01"
+      }
+    ],
+    "hydrated_journey": {
+      "session_id": "2651f9f0-771b-49fa-9add-bac441e6c29f",
+      "visitor_id": "VIS_001",
+      "journey_path": [
+        "SKINCARE"
+      ],
+      "entered_at": "2026-05-31T12:00:00Z",
+      "exited_at": "2026-05-31T12:00:51.251200Z",
+      "zones_visited": [
+        "SKINCARE"
+      ],
+      "joined_billing_queue": false,
+      "associated_transaction": null,
+      "event_count": 15,
+      "session_duration_ms": 51251.2
+    }
+  },
+  "data_source_audit": {
+    "visitor_events": "REAL \u2014 YOLOv8n detection + ByteTrack tracking on actual CAM 1.mp4 video frames",
+    "sessions": "REAL \u2014 derived from visitor_events by SessionHydrationService",
+    "metrics": "REAL \u2014 counted from visitor_sessions table via SQL WHERE store_id filter",
+    "brigade_pos_transactions": "REAL \u2014 parsed from Brigade_Bangalore CSV file (Sprint 19)",
+    "mock_data": "NONE in this validation run \u2014 e2e_verifier.py TXN_E2E_001 is isolated to its own STORE_E2E_01 store"
+  }
+}

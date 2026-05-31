@@ -23,10 +23,14 @@ class GeneratedEvent:
     store_id: str
     timestamp: str  # ISO-8601 string
     confidence: float
-    event_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    event_id: str = field(default_factory=lambda: "")
     zone_id: str | None = None
     dwell_ms: int | None = None
     camera_id: str | None = None
+
+    def __post_init__(self):
+        unique_string = f"{self.store_id}:{self.camera_id or ''}:{self.visitor_id}:{self.event_type}:{self.timestamp}:{self.zone_id or ''}"
+        self.event_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, unique_string))
 
     def to_dict(self) -> dict:
         data = {

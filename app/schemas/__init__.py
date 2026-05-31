@@ -16,6 +16,13 @@ from app.schemas.journeys import (
     JourneyResponse,
 )
 from app.schemas.correlation import CorrelationDiagnosticsResponse
+from app.schemas.insights import (
+    RevenueInsightsSchema,
+    ProductInsightsSchema,
+    OfferInsightsSchema,
+    SalespersonInsightsSchema,
+    ExecutiveSummarySchema,
+)
 
 __all__ = [
     "EventBase",
@@ -34,5 +41,12 @@ __all__ = [
     "JourneyAuditSchema",
     "JourneyResponse",
     "CorrelationDiagnosticsResponse",
+    "RevenueInsightsSchema",
+    "ProductInsightsSchema",
+    "OfferInsightsSchema",
+    "SalespersonInsightsSchema",
+    "ExecutiveSummarySchema",
 ]
+
+
 

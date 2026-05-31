@@ -60,6 +60,10 @@ class EventGenerator:
 
         # Map of track_id -> TrackState
         self.active_tracks: dict[int, TrackState] = {}
+        
+        # Safeguards to prevent duplicate emissions
+        self.emitted_entries: set[str] = set()
+        self.visitor_current_zones: dict[str, str] = {}
 
     def get_timestamp_for_frame(self, frame_idx: int) -> str:
         """Calculates ISO-8601 formatted timestamp for a given frame index."""
@@ -92,16 +96,22 @@ class EventGenerator:
             # 1. ENTRY Detection
             if not state.has_entered_store:
                 if self.zone_engine.is_in_entry(track):
-                    state.has_entered_store = True
-                    events.append(
-                        GeneratedEvent(
-                            event_type="ENTRY",
-                            visitor_id=state.visitor_id,
-                            store_id=self.store_id,
-                            timestamp=timestamp,
-                            confidence=avg_conf,
-                        )
+                    visitor_already_active = state.visitor_id in self.emitted_entries or any(
+                        s.visitor_id == state.visitor_id and s.has_entered_store
+                        for s in self.active_tracks.values()
                     )
+                    state.has_entered_store = True
+                    if not visitor_already_active:
+                        self.emitted_entries.add(state.visitor_id)
+                        events.append(
+                            GeneratedEvent(
+                                event_type="ENTRY",
+                                visitor_id=state.visitor_id,
+                                store_id=self.store_id,
+                                timestamp=timestamp,
+                                confidence=avg_conf,
+                            )
+                        )
 
             # 2. Zone Change & Transition Debouncing
             active_retail_zone = self.zone_engine.get_retail_zone(track)
@@ -117,8 +127,12 @@ class EventGenerator:
                 if state.consecutive_frames_in_zone >= self.zone_debounce_frames:
                     # Exit the previous zone if one was active
                     if state.current_zone is not None:
-                        dwell_frames = frame_idx - state.zone_dwell_start_frame
+                        dwell_frames = frame_idx - state.last_dwell_emission_frame
                         dwell_ms = int((dwell_frames / self.fps) * 1000)
+                        
+                        if self.visitor_current_zones.get(state.visitor_id) == state.current_zone:
+                            del self.visitor_current_zones[state.visitor_id]
+
                         events.append(
                             GeneratedEvent(
                                 event_type="ZONE_EXIT",
@@ -129,17 +143,18 @@ class EventGenerator:
                                 zone_id=state.current_zone,
                             )
                         )
-                        events.append(
-                            GeneratedEvent(
-                                event_type="ZONE_DWELL",
-                                visitor_id=state.visitor_id,
-                                store_id=self.store_id,
-                                timestamp=timestamp,
-                                confidence=avg_conf,
-                                zone_id=state.current_zone,
-                                dwell_ms=dwell_ms,
+                        if dwell_ms > 0:
+                            events.append(
+                                GeneratedEvent(
+                                    event_type="ZONE_DWELL",
+                                    visitor_id=state.visitor_id,
+                                    store_id=self.store_id,
+                                    timestamp=timestamp,
+                                    confidence=avg_conf,
+                                    zone_id=state.current_zone,
+                                    dwell_ms=dwell_ms,
+                                )
                             )
-                        )
 
                     # Enter the new zone
                     state.current_zone = active_retail_zone
@@ -149,16 +164,20 @@ class EventGenerator:
                     if state.current_zone is not None:
                         state.zone_dwell_start_frame = frame_idx
                         state.last_dwell_emission_frame = frame_idx
-                        events.append(
-                            GeneratedEvent(
-                                event_type="ZONE_ENTER",
-                                visitor_id=state.visitor_id,
-                                store_id=self.store_id,
-                                timestamp=timestamp,
-                                confidence=avg_conf,
-                                zone_id=state.current_zone,
+                        
+                        visitor_already_in_zone = self.visitor_current_zones.get(state.visitor_id) == state.current_zone
+                        if not visitor_already_in_zone:
+                            self.visitor_current_zones[state.visitor_id] = state.current_zone
+                            events.append(
+                                GeneratedEvent(
+                                    event_type="ZONE_ENTER",
+                                    visitor_id=state.visitor_id,
+                                    store_id=self.store_id,
+                                    timestamp=timestamp,
+                                    confidence=avg_conf,
+                                    zone_id=state.current_zone,
+                                )
                             )
-                        )
             else:
                 # Reset candidate trackers if track remains in the current zone
                 state.candidate_zone = None
@@ -206,11 +225,15 @@ class EventGenerator:
                     avg_conf = state.get_average_confidence()
 
                     # Exit retail zone if still inside one
-                    if state.current_zone is not None and state.zone_dwell_start_frame is not None:
-                        # Dwell counts up to the last frame the track was visible
-                        dwell_frames = state.last_seen_frame - state.zone_dwell_start_frame
+                    if state.current_zone is not None and state.last_dwell_emission_frame is not None:
+                        # Dwell counts up to the last frame the track was visible, relative to last emission frame
+                        dwell_frames = state.last_seen_frame - state.last_dwell_emission_frame
                         dwell_ms = max(0, int((dwell_frames / self.fps) * 1000))
                         last_seen_timestamp = self.get_timestamp_for_frame(state.last_seen_frame)
+                        
+                        if self.visitor_current_zones.get(state.visitor_id) == state.current_zone:
+                            del self.visitor_current_zones[state.visitor_id]
+
                         events.append(
                             GeneratedEvent(
                                 event_type="ZONE_EXIT",
@@ -221,17 +244,18 @@ class EventGenerator:
                                 zone_id=state.current_zone,
                             )
                         )
-                        events.append(
-                            GeneratedEvent(
-                                event_type="ZONE_DWELL",
-                                visitor_id=state.visitor_id,
-                                store_id=self.store_id,
-                                timestamp=last_seen_timestamp,
-                                confidence=avg_conf,
-                                zone_id=state.current_zone,
-                                dwell_ms=dwell_ms,
+                        if dwell_ms > 0:
+                            events.append(
+                                GeneratedEvent(
+                                    event_type="ZONE_DWELL",
+                                    visitor_id=state.visitor_id,
+                                    store_id=self.store_id,
+                                    timestamp=last_seen_timestamp,
+                                    confidence=avg_conf,
+                                    zone_id=state.current_zone,
+                                    dwell_ms=dwell_ms,
+                                )
                             )
-                        )
 
                     # Generate final EXIT event at the last visible frame
                     if state.has_entered_store:

@@ -81,3 +81,23 @@ curl http://127.0.0.1:8000/api/v1/stores/STORE_E2E_01/journeys
 ```powershell
 curl http://127.0.0.1:8000/api/v1/stores/STORE_E2E_01/correlations
 ```
+
+---
+
+## Demo Flow
+
+### 4. Data Loading (New)
+
+To populate the system with the challenge dataset, run the provided loader script. This only needs to be done once.
+
+```bash
+python -m data.load_brigade_transactions
+```
+
+This command will:
+- Read the `Brigade_Bangalore_10_April_26 (1)bc6219c (1).csv` file.
+- Clean and validate the data.
+- Load it into the `transactions` table in your PostgreSQL database.
+- Print a verification of row counts and total revenue.
+
+### 5. Run E2E Verification

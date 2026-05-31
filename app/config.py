@@ -3,6 +3,9 @@ from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+BRAND_TO_SECTION_MAPPING_PATH = "app/config/brand_to_section_mapping.json"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",

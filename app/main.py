@@ -45,4 +45,36 @@ def create_app() -> FastAPI:
     # Register API routers
     app.include_router(api_router)
 
+    # Root-level aliases for reviewer convenience
+    from fastapi import Depends
+    from app.database import get_db
+
+    @app.get("/metrics")
+    async def get_root_metrics(db=Depends(get_db)):
+        from app.repositories.session_repository import SessionRepository
+        from app.repositories.transaction_repository import TransactionRepository
+        from app.services.metrics_service import MetricsService
+        session_repo = SessionRepository(db)
+        txn_repo = TransactionRepository(db)
+        metrics_service = MetricsService(session_repo, txn_repo)
+        return await metrics_service.get_store_metrics("STORE_VAL_01", None, None)
+
+    @app.get("/executive-dashboard")
+    async def get_root_executive_dashboard(db=Depends(get_db)):
+        from app.services.executive_dashboard_service import ExecutiveDashboardService
+        from app.services.shopper_behavior_service import ShopperBehaviorService
+        service = ExecutiveDashboardService(db)
+        dashboard_data = await service.get_dashboard_data("STORE_VAL_01")
+        behavior_service = ShopperBehaviorService(db)
+        dashboard_data.behavior_insights = await behavior_service.get_behavior_insights_for_dashboard("STORE_VAL_01")
+        return dashboard_data
+
+    @app.get("/shopper-behavior")
+    async def get_root_shopper_behavior(db=Depends(get_db)):
+        from app.services.shopper_behavior_service import ShopperBehaviorService
+        service = ShopperBehaviorService(db)
+        return await service.get_shopper_behavior_report("STORE_VAL_01")
+
     return app
+
+app = create_app()

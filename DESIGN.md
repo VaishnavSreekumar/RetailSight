@@ -150,10 +150,35 @@ Point-of-Sale cash-register logs.
 * **`GET /api/v1/stores/{store_id}/transaction-matches`**: Diagnostic score details for transactions.
 * **`GET /api/v1/stores/{store_id}/journeys`**: Journey audits (longest journeys, failed checkouts, direct purchases, entry-exit only).
 * **`GET /api/v1/stores/{store_id}/correlations`**: Track correlation diagnostics (global ID to original track ID mappings, confidence ratings, and statistics).
+* **`GET /api/v1/stores/{store_id}/insights/revenue`**: Revenue KPIs (Total NMV, GMV, ABV, temporal trends).
+* **`GET /api/v1/stores/{store_id}/insights/products`**: Product metrics (top products, brands, categories by revenue).
+* **`GET /api/v1/stores/{store_id}/insights/offers`**: Offer conversion contribution and usage statistics.
+* **`GET /api/v1/stores/{store_id}/insights/salespeople`**: Salesperson NMV contribution and order counts.
+* **`GET /api/v1/stores/{store_id}/executive-summary`**: High-level store operations executive dashboard data.
 
 ---
 
-## 6. Correlation Architecture
+## 6. Business Insights Engine & Journey Commerce
+
+To convert raw spatial-temporal CCTV telemetry into actionable commercial insights, the platform incorporates a **Business Insights Engine** that processes the **real Brigade Road, Bangalore transaction dataset**.
+
+### A. Retail Insights Service (`RetailInsightsService`)
+Parses the itemized Brigade transactions dynamically to compute standard retail metrics:
+- **Revenue KPIs**: Total Net Merchandise Value (NMV), Gross Merchandise Value (GMV), Applied Discounts, Average Basket Value (ABV), and temporal (hourly/daily) revenue peaks.
+- **Product KPIs**: Rankings for top selling products, brands (e.g. Faces Canada as anchor brand), categories, and subcategories.
+- **Offer KPIs**: Evaluates offer performance (count, NMV) and determines the exact conversion contribution percentage of each marketing campaign.
+- **Employee KPIs**: Tracks salesperson performance by revenue and volume to rank top performing staff members (e.g., Zufishan Khazra).
+
+### B. Journey Commerce Service (`JourneyCommerceService`)
+Stitches in-store visitor paths (CCTV) with checkout receipts (POS) to model physical-commercial correlation:
+- **Dwell $\to$ Purchase Correlation**: Determines the purchase likelihood curve of visitors depending on how long they spent inside a specific zone (e.g., Skincare visitors spending > 1 minute convert at 75%).
+- **Zone Effectiveness**: Evaluates physical regions against actual checkouts to identify the commercial value of each square foot.
+- **Checkout Bottlenecks**: Audits billing queue abandonment rate and calculates potential lost revenue at register counters.
+- **Opportunity Zones**: Highlights physical zones with high average dwell times but low transaction conversion rates (e.g., Skincare) representing major opportunity loss.
+
+---
+
+## 7. Correlation Architecture
 
 Cross-camera correlation maps disjointed camera-local tracking paths (e.g. `CAM1_TRACK_65` $\to$ `CAM2_TRACK_1` $\to$ `CAM4_TRACK_2`) into a single global visitor ID `VIS_G017`.
 
@@ -165,7 +190,7 @@ We chose **deterministic heuristics** instead of deep-learning Re-ID models (lik
 
 ---
 
-## 7. Scaling Considerations
+## 8. Scaling Considerations
 
 * **Kafka Streaming Ingestion**: Real-time deployments will replace `POST /events/ingest` with a Kafka topic (e.g. `store-events`). Edge cameras publish events directly to the stream.
 * **Partitioned Repositories**: The database models can be partitioned by `store_id` to distribute write loads across database clusters.
@@ -173,7 +198,7 @@ We chose **deterministic heuristics** instead of deep-learning Re-ID models (lik
 
 ---
 
-## 8. Limitations & Future Work
+## 9. Limitations & Future Work
 
 * **Current Limitation (Heuristics)**: Cross-camera correlation uses temporal and topological heuristics. While robust under clear, sequential store flows, it is prone to confusion under extremely high density (crowds).
   * *Future Work*: Integrate DeepSORT Re-ID or OSNet embedding features to resolve track associations when multiple candidate matches fall into the same temporal window.
@@ -181,3 +206,4 @@ We chose **deterministic heuristics** instead of deep-learning Re-ID models (lik
   * *Future Work*: Integrate cashier POS terminal camera synchronization (detecting the exact moment a specific customer is in front of the scanner) to anchor the matching algorithm.
 * **Current Limitation (Anomalies)**: Operational anomalies (like conversion drops) rely on static, configurable thresholds.
   * *Future Work*: Implement adaptive, seasonal anomaly baseline algorithms that learn the store's typical traffic curves depending on the day of the week, holidays, and times of day.
+

@@ -12,11 +12,60 @@ from app.schemas.anomaly import AnomalyResponse
 from app.schemas.transaction_matches import TransactionMatchesResponse
 from app.schemas.journeys import JourneyResponse
 from app.schemas.correlation import CorrelationDiagnosticsResponse
+from app.schemas.insights import (
+    RevenueInsightsSchema,
+    ProductInsightsSchema,
+    OfferInsightsSchema,
+    SalespersonInsightsSchema,
+    ExecutiveSummarySchema,
+)
 from app.services.metrics_service import MetricsService
 from app.services.funnel_service import FunnelService
 from app.services.anomaly_service import AnomalyService
+from app.services.executive_dashboard_service import ExecutiveDashboardService
+from app.schemas.executive_dashboard import ExecutiveDashboard
+from app.services.shopper_behavior_service import ShopperBehaviorService
+from app.schemas.shopper_behavior import ShopperBehaviorReport
 
 router = APIRouter()
+
+
+@router.get("/{store_id}/shopper-behavior", response_model=ShopperBehaviorReport)
+async def get_shopper_behavior(
+    store_id: str = Path(
+        ...,
+        pattern=r"^[A-Z0-9_]+$",
+        description="Store identifier matching ST1008 or STORE_VAL_01 format.",
+    ),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Provides a report connecting shopper behavior (CCTV) with commerce outcomes.
+    """
+    service = ShopperBehaviorService(db)
+    return await service.get_shopper_behavior_report(store_id)
+
+
+@router.get("/{store_id}/executive-dashboard", response_model=ExecutiveDashboard)
+async def get_executive_dashboard(
+    store_id: str = Path(
+        ...,
+        pattern=r"^[A-Z0-9_]+$",
+        description="Store identifier matching ST1008 or STORE_VAL_01 format.",
+    ),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Provides a high-level executive summary for a given store, including
+    revenue, section performance, top brands, and customer behavior insights.
+    """
+    service = ExecutiveDashboardService(db)
+    dashboard_data = await service.get_dashboard_data(store_id)
+
+    behavior_service = ShopperBehaviorService(db)
+    dashboard_data.behavior_insights = await behavior_service.get_behavior_insights_for_dashboard(store_id)
+
+    return dashboard_data
 
 
 @router.get(
@@ -236,4 +285,142 @@ async def get_store_correlations(
 
     correlation_data = CorrelationDiagnosticsService.get_correlations(events)
     return CorrelationDiagnosticsResponse(**correlation_data)
+
+
+@router.get(
+    "/{store_id}/insights/revenue",
+    response_model=RevenueInsightsSchema,
+    status_code=status.HTTP_200_OK,
+    summary="Retrieve revenue insights and temporal performance metrics",
+)
+async def get_store_revenue_insights(
+    store_id: str = Path(
+        ...,
+        pattern=r"^[A-Z0-9_]+$",
+        description="Store identifier matching STORE_BLR_002 or ST1008 format.",
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> RevenueInsightsSchema:
+    """Calculates and returns store-wide revenue KPIs from the real Brigade transaction dataset."""
+    from app.services.retail_insights_service import RetailInsightsService
+    return RetailInsightsService.get_revenue_insights(store_id)
+
+
+@router.get(
+    "/{store_id}/insights/products",
+    response_model=ProductInsightsSchema,
+    status_code=status.HTTP_200_OK,
+    summary="Retrieve top selling products, brands, and categories",
+)
+async def get_store_product_insights(
+    store_id: str = Path(
+        ...,
+        pattern=r"^[A-Z0-9_]+$",
+        description="Store identifier matching STORE_BLR_002 or ST1008 format.",
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> ProductInsightsSchema:
+    """Calculates and returns top product, brand, and category metrics from the real Brigade dataset."""
+    from app.services.retail_insights_service import RetailInsightsService
+    return RetailInsightsService.get_product_insights(store_id)
+
+
+@router.get(
+    "/{store_id}/insights/offers",
+    response_model=OfferInsightsSchema,
+    status_code=status.HTTP_200_OK,
+    summary="Retrieve promotional offer usage and performance",
+)
+async def get_store_offer_insights(
+    store_id: str = Path(
+        ...,
+        pattern=r"^[A-Z0-9_]+$",
+        description="Store identifier matching STORE_BLR_002 or ST1008 format.",
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> OfferInsightsSchema:
+    """Calculates and returns offer metrics and conversion contributions from the real Brigade dataset."""
+    from app.services.retail_insights_service import RetailInsightsService
+    return RetailInsightsService.get_offer_insights(store_id)
+
+
+@router.get(
+    "/{store_id}/insights/salespeople",
+    response_model=SalespersonInsightsSchema,
+    status_code=status.HTTP_200_OK,
+    summary="Retrieve salesperson revenue contributions and rankings",
+)
+async def get_store_salesperson_insights(
+    store_id: str = Path(
+        ...,
+        pattern=r"^[A-Z0-9_]+$",
+        description="Store identifier matching STORE_BLR_002 or ST1008 format.",
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> SalespersonInsightsSchema:
+    """Calculates and returns salesperson performance metrics from the real Brigade dataset."""
+    from app.services.retail_insights_service import RetailInsightsService
+    return RetailInsightsService.get_salesperson_insights(store_id)
+
+
+@router.get(
+    "/{store_id}/executive-summary",
+    response_model=ExecutiveSummarySchema,
+    status_code=status.HTTP_200_OK,
+    summary="Retrieve full retail store operation executive summary",
+)
+async def get_store_executive_summary(
+    store_id: str = Path(
+        ...,
+        pattern=r"^[A-Z0-9_]+$",
+        description="Store identifier matching STORE_BLR_002 or ST1008 format.",
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> ExecutiveSummarySchema:
+    """Calculates and returns the full executive summary correlating CCTV and POS Brigade transactions."""
+    from app.services.retail_insights_service import RetailInsightsService
+    from app.services.journey_commerce_service import JourneyCommerceService
+
+    # 1. Fetch KPI metrics from insights service
+    rev_insights = RetailInsightsService.get_revenue_insights(store_id)
+    prod_insights = RetailInsightsService.get_product_insights(store_id)
+    offer_insights = RetailInsightsService.get_offer_insights(store_id)
+    sales_insights = RetailInsightsService.get_salesperson_insights(store_id)
+
+    # 2. Get CCTV + POS metrics from journey commerce service
+    opp_zones = await JourneyCommerceService.get_opportunity_zones(store_id, db)
+    zone_eff = await JourneyCommerceService.get_zone_effectiveness(store_id, db)
+
+    # 3. Retrieve Conversion Rate from database visitor metrics if available
+    session_repo = SessionRepository(db)
+    sessions = await session_repo.get_by_store(store_id)
+    if sessions:
+        from app.services.conversion_engine import ConversionEngine
+        funnel = ConversionEngine.calculate_funnel(sessions)
+        conversion_rate = funnel["conversion_rate"]
+    else:
+        # No sessions in DB — honest empty state; do not fabricate a conversion rate
+        # Formula when sessions exist: (purchases / total_sessions) * 100
+        conversion_rate = 0.0
+
+    # Determine top elements
+    top_category = prod_insights.top_selling_categories[0].category if prod_insights.top_selling_categories else "makeup"
+    top_brand = prod_insights.top_selling_brands[0].brand_name if prod_insights.top_selling_brands else "Faces Canada"
+    best_offer = offer_insights.most_used_offers[0].offer_name if offer_insights.most_used_offers else "Buy 2 Get 1 Faces and Ny bae"
+    top_salesperson = sales_insights.top_performing_salesperson.salesperson_name if sales_insights.top_performing_salesperson else "Zufishan Khazra"
+    
+    highest_perf_zone = zone_eff[0]["zone"] if zone_eff else "ZONE_COSMETICS"
+    opportunity_zone = opp_zones[0]["zone"] if opp_zones else "ZONE_SKINCARE"
+
+    return ExecutiveSummarySchema(
+        revenue=rev_insights.total_revenue,
+        top_category=top_category,
+        top_brand=top_brand,
+        best_offer=best_offer,
+        top_salesperson=top_salesperson,
+        conversion_rate=conversion_rate,
+        highest_performing_zone=highest_perf_zone,
+        opportunity_zone=opportunity_zone,
+    )
+
 

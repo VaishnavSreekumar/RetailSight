@@ -25,11 +25,22 @@ class SessionHydrator:
         if not events:
             return []
 
-        # 1. Group events by (visitor_id, store_id)
+        # 1. Group events by (visitor_id, store_id), filtering out exact duplicates
         grouped_events = defaultdict(list)
+        seen_events = set()
         for event in events:
             visitor_id = _get_field(event, "visitor_id")
             store_id = _get_field(event, "store_id")
+            event_type = _get_field(event, "event_type")
+            timestamp = _get_field(event, "timestamp")
+            zone_id = _get_field(event, "zone_id")
+            
+            ts_key = timestamp.isoformat() if hasattr(timestamp, "isoformat") else str(timestamp)
+            event_key = (visitor_id, store_id, event_type, ts_key, zone_id)
+            if event_key in seen_events:
+                continue
+            seen_events.add(event_key)
+
             if visitor_id and store_id:
                 grouped_events[(visitor_id, store_id)].append(event)
 
@@ -42,9 +53,29 @@ class SessionHydrator:
                 visitor_events, key=lambda e: _get_field(e, "timestamp")
             )
 
+            # Deduplicate consecutive duplicates as a safety net
+            filtered_events = []
+            for event in sorted_events:
+                event_type = _get_field(event, "event_type")
+                zone_id = _get_field(event, "zone_id")
+                
+                # Check for consecutive duplicate ENTRY
+                if event_type == "ENTRY" and filtered_events:
+                    prev_event = filtered_events[-1]
+                    if _get_field(prev_event, "event_type") == "ENTRY":
+                        continue
+                
+                # Check for consecutive duplicate ZONE_ENTER for the same zone
+                if event_type == "ZONE_ENTER" and filtered_events:
+                    prev_event = filtered_events[-1]
+                    if _get_field(prev_event, "event_type") == "ZONE_ENTER" and _get_field(prev_event, "zone_id") == zone_id:
+                        continue
+                        
+                filtered_events.append(event)
+
             current_session: VisitorSession | None = None
 
-            for event in sorted_events:
+            for event in filtered_events:
                 event_type = _get_field(event, "event_type")
                 timestamp = _get_field(event, "timestamp")
                 is_staff = _get_field(event, "is_staff", False)
@@ -53,6 +84,9 @@ class SessionHydrator:
 
                 # If no session is currently active
                 if current_session is None:
+                    # Prevent session initialization on event types other than ENTRY, REENTRY, or ZONE_ENTER
+                    if event_type not in ("ENTRY", "REENTRY", "ZONE_ENTER"):
+                        continue
                     # Initialize a new session
                     current_session = VisitorSession(
                         id=uuid.uuid4(),

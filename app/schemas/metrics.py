@@ -48,7 +48,8 @@ class StoreMetrics(BaseModel):
         ...,
         ge=0.0,
         le=100.0,
-        description="Overall store purchase conversion rate percentage.",
+        description="Overall store purchase conversion rate as a percentage (0.0–100.0). "
+                    "Formula: (purchases / total_entries) * 100.",
     )
     avg_session_dwell_ms: float = Field(
         ..., description="Average shopping session dwell duration in milliseconds."

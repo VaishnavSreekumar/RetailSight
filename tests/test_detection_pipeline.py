@@ -112,8 +112,8 @@ def test_event_generator_state_machine() -> None:
 
     dwell_event = [e for e in events if e.event_type == "ZONE_DWELL"][0]
     assert dwell_event.zone_id == "SKINCARE"
-    # Dwell from frame 3 (entry) to 35 (exit) is 32 frames -> 32 / 30 = 1066.6ms
-    assert 1000 <= dwell_event.dwell_ms <= 1100
+    # Dwell from last emission (frame 33) to exit (frame 35) is 2 frames -> 2 / 30 = 66.6ms
+    assert 50 <= dwell_event.dwell_ms <= 80
 
     # Track moves to Billing
     t_billing = Track(track_id=1, bbox=(8.5, 8.5, 9.5, 9.0), confidence=0.9)

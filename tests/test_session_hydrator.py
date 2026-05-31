@@ -198,3 +198,117 @@ def test_billing_queue_join() -> None:
     session = sessions[0]
 
     assert session.has_joined_billing_queue is True
+
+
+def test_exact_duplicate_event_filtering() -> None:
+    """Validates that exact identical events in the input stream are filtered out."""
+    events = [
+        {
+            "visitor_id": "VIS_dup001",
+            "store_id": "STORE_BLR_002",
+            "event_type": "ENTRY",
+            "timestamp": datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+        },
+        # Exact duplicate
+        {
+            "visitor_id": "VIS_dup001",
+            "store_id": "STORE_BLR_002",
+            "event_type": "ENTRY",
+            "timestamp": datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+        },
+        {
+            "visitor_id": "VIS_dup001",
+            "store_id": "STORE_BLR_002",
+            "event_type": "EXIT",
+            "timestamp": datetime(2026, 5, 30, 10, 10, 0, tzinfo=timezone.utc),
+        },
+    ]
+    sessions = SessionHydrator.hydrate_sessions(events)
+    assert len(sessions) == 1
+    assert sessions[0].entered_at == datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc)
+    assert sessions[0].exited_at == datetime(2026, 5, 30, 10, 10, 0, tzinfo=timezone.utc)
+
+
+def test_consecutive_duplicate_entry_deduplication() -> None:
+    """Validates that consecutive ENTRY events are ignored/deduplicated."""
+    events = [
+        {
+            "visitor_id": "VIS_dup002",
+            "store_id": "STORE_BLR_002",
+            "event_type": "ENTRY",
+            "timestamp": datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+        },
+        {
+            "visitor_id": "VIS_dup002",
+            "store_id": "STORE_BLR_002",
+            "event_type": "ENTRY",
+            "timestamp": datetime(2026, 5, 30, 10, 0, 5, tzinfo=timezone.utc),  # Consecutive duplicate
+        },
+        {
+            "visitor_id": "VIS_dup002",
+            "store_id": "STORE_BLR_002",
+            "event_type": "EXIT",
+            "timestamp": datetime(2026, 5, 30, 10, 10, 0, tzinfo=timezone.utc),
+        },
+    ]
+    sessions = SessionHydrator.hydrate_sessions(events)
+    assert len(sessions) == 1
+    assert sessions[0].entered_at == datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc)
+
+
+def test_consecutive_duplicate_zone_enter_deduplication() -> None:
+    """Validates that consecutive ZONE_ENTER events for the same zone are ignored/deduplicated."""
+    events = [
+        {
+            "visitor_id": "VIS_dup003",
+            "store_id": "STORE_BLR_002",
+            "event_type": "ENTRY",
+            "timestamp": datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+        },
+        {
+            "visitor_id": "VIS_dup003",
+            "store_id": "STORE_BLR_002",
+            "event_type": "ZONE_ENTER",
+            "zone_id": "zone_apparel",
+            "timestamp": datetime(2026, 5, 30, 10, 2, 0, tzinfo=timezone.utc),
+        },
+        {
+            "visitor_id": "VIS_dup003",
+            "store_id": "STORE_BLR_002",
+            "event_type": "ZONE_ENTER",
+            "zone_id": "zone_apparel",
+            "timestamp": datetime(2026, 5, 30, 10, 3, 0, tzinfo=timezone.utc),  # Consecutive duplicate
+        },
+        {
+            "visitor_id": "VIS_dup003",
+            "store_id": "STORE_BLR_002",
+            "event_type": "EXIT",
+            "timestamp": datetime(2026, 5, 30, 10, 10, 0, tzinfo=timezone.utc),
+        },
+    ]
+    sessions = SessionHydrator.hydrate_sessions(events)
+    assert len(sessions) == 1
+    assert sessions[0].journey_path == ["zone_apparel"]
+
+
+def test_ghost_session_prevention() -> None:
+    """Validates that sessions are not initialized on stray ZONE_DWELL or EXIT events."""
+    events = [
+        {
+            "visitor_id": "VIS_ghost",
+            "store_id": "STORE_BLR_002",
+            "event_type": "ZONE_DWELL",
+            "zone_id": "zone_groceries",
+            "dwell_ms": 5000,
+            "timestamp": datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+        },
+        {
+            "visitor_id": "VIS_ghost",
+            "store_id": "STORE_BLR_002",
+            "event_type": "EXIT",
+            "timestamp": datetime(2026, 5, 30, 10, 5, 0, tzinfo=timezone.utc),
+        },
+    ]
+    sessions = SessionHydrator.hydrate_sessions(events)
+    assert len(sessions) == 0
+

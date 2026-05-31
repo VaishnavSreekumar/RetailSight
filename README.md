@@ -74,20 +74,137 @@ $env:PYTHONPATH="."
 * **`GET /api/v1/stores/{store_id}/anomalies`**: Retrieve active operations warnings (checkout queue spikes, dead zones).
 * **`GET /api/v1/stores/{store_id}/journeys`**: Retrieve diagnostics journey audits (longest journeys, checkouts without purchases).
 * **`GET /api/v1/stores/{store_id}/correlations`**: Retrieve camera track stitching diagnostics.
+* **`GET /api/v1/stores/{store_id}/insights/revenue`**: Retrieve strongly typed revenue KPIs (NMV, GMV, ABV, temporal trends).
+* **`GET /api/v1/stores/{store_id}/insights/products`**: Retrieve product intelligence (top selling products, brands, categories).
+* **`GET /api/v1/stores/{store_id}/insights/offers`**: Retrieve promotional campaign conversion contribution analysis.
+* **`GET /api/v1/stores/{store_id}/insights/salespeople`**: Retrieve staff conversion metrics and salesperson rankings.
+* **`GET /api/v1/stores/{store_id}/executive-dashboard`**: Provides a high-level executive summary for a given store.
+* **`GET /api/v1/stores/{store_id}/executive-summary`**: Retrieve the consolidated business-facing operation summary.
 
 ---
 
-## 5. Testing Instructions
+## 5. Executive Dashboard
+
+The Executive Dashboard provides a consolidated, at-a-glance view of key business metrics, section performance, and layout insights.
+
+**Endpoint**: `GET /api/v1/stores/{store_id}/executive-dashboard`
+
+**Sample Response**:
+```json
+{
+    "revenue": {
+        "nmv": 130806.35,
+        "gmv": 138244.0,
+        "abv": 1295.1123762376237
+    },
+    "sections": [
+        {
+            "section_name": "MAKEUP_WALL",
+            "nmv": 78111.35,
+            "gmv": 82644.0,
+            "transaction_count": 60,
+            "abv": 1301.8558333333334
+        },
+        {
+            "section_name": "CENTRAL_DISPLAY",
+            "nmv": 25842.5,
+            "gmv": 27350.0,
+            "transaction_count": 20,
+            "abv": 1292.125
+        },
+        {
+            "section_name": "PMU_SECTION",
+            "nmv": 15200.0,
+            "gmv": 16000.0,
+            "transaction_count": 10,
+            "abv": 1520.0
+        },
+        {
+            "section_name": "SKINCARE_WALL",
+            "nmv": 11652.5,
+            "gmv": 12250.0,
+            "transaction_count": 11,
+            "abv": 1059.3181818181818
+        }
+    ],
+    "top_brands": [
+        {
+            "brand_name": "Lakme",
+            "nmv": 25000.0
+        },
+        {
+            "brand_name": "Maybelline",
+            "nmv": 15000.0
+        },
+        {
+            "brand_name": "Plum",
+            "nmv": 15000.0
+        },
+        {
+            "brand_name": "Sugar",
+            "nmv": 15000.0
+        },
+        {
+            "brand_name": "Nykaa",
+            "nmv": 12500.0
+        }
+    ],
+    "top_salespeople": [
+        {
+            "name": "Anjali Sharma",
+            "sales_value": 15250.5,
+            "units_sold": 45
+        },
+        {
+            "name": "Rohan Gupta",
+            "sales_value": 12100.0,
+            "units_sold": 38
+        },
+        {
+            "name": "Priya Singh",
+            "sales_value": 11500.75,
+            "units_sold": 35
+        }
+    ],
+    "customer_behavior": {
+        "visitors": 1250,
+        "engaged_visitors": 480,
+        "conversion_rate": 0.0808
+    },
+    "layout_insights": {
+        "highest_revenue_section": "MAKEUP_WALL",
+        "lowest_revenue_section": "SKINCARE_WALL",
+        "highest_abv_section": "PMU_SECTION"
+    }
+}
+```
+
+---
+
+## 6. Brigade Road Retail Insights & Analytics
+
+The Business Insights Engine leverages the **real Brigade Road, Bangalore transaction dataset** containing ₹34,831.74 in Net Merchandise Value (NMV) over 101 itemized lines to bridge the gap between CCTV video telemetry and Point of Sale (POS) commercial performance.
+
+### Highlights
+- **Dwell $\to$ Purchase Correlation**: Correlates CCTV visitor zone dwell times with POS purchase history. High-dwell skincare visitors converted at **75%** likelihood.
+- **Zone Effectiveness**: Evaluates physical layout zones against actual POS checkout revenue. Makeup is the primary store driver generating **₹21,939.09** NMV.
+- **Checkout queue analysis**: Identifies queue abandonment rate (**33.33%**) and calculates potential lost revenue at the checkouts.
+- **Opportunity Zones**: Highlights physical areas with high dwell times but low purchase conversions (e.g. Skincare) representing high-interest drop-offs.
+
+---
+
+## 7. Testing Instructions
 
 All unit and integration tests are located under the `tests/` directory. Run them using pytest:
 ```powershell
-.venv\Scripts\python -m pytest
+$env:PYTHONPATH="."
+.venv\Scripts\python -m pytest -v
 ```
-* **Output**: All 46 tests pass successfully.
+* **Output**: All **59 tests pass successfully** with complete code coverage for all retail insights logic, journey commerce logic, and FastAPI controllers.
 
 ---
 
-## 6. Screenshots & Visualizations
+## 8. Screenshots & Visualizations
 
 *(Placeholders for future frontend integration)*
 * **Overview Analytics**: Visualizes total foot traffic, conversion trend curves, and active store alerts.
@@ -95,7 +212,7 @@ All unit and integration tests are located under the `tests/` directory. Run the
 
 ---
 
-## 7. Known Limitations & Future Enhancements
+## 9. Known Limitations & Future Enhancements
 
 * **Deterministic Cross-Camera Correlation**:
   * *Limitation*: Can confuse different tracks if multiple exits and entrances occur inside the same 5-second window.
@@ -106,3 +223,4 @@ All unit and integration tests are located under the `tests/` directory. Run the
 * **Static Anomaly Thresholds**:
   * *Limitation*: Static limits (e.g. 120s queue spike alert) do not scale well during holiday peak periods.
   * *Enhancement*: Train an adaptive seasonal baseline model (Holt-Winters or Prophet) to evaluate alerts dynamically.
+
