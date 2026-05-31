@@ -19,3 +19,7 @@ tests
 docker-compose.yml
 alembic.ini
 migrations/
+CCTV Footage/
+*.xlsx
+*.csv
+*.pt

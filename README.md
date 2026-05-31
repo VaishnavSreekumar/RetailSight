@@ -30,38 +30,86 @@ For a detailed view of the system diagrams, refer to [DESIGN.md](./DESIGN.md) an
 
 ## 3. Quick Start & Replication
 
-Ensure you are using **PowerShell** from the root folder `c:\Users\vaish\retail-intelligence`:
+Ensure you are using **PowerShell** from the root folder `c:\Users\vaish\retail-intelligence`.
 
-### Step 1: Active Python Environment
+> [!IMPORTANT]
+> **Port 8000 Conflict Resolution**: The backend server runs on port `8000`. If you have a local Uvicorn process, another FastAPI project, or an old container using port 8000, you will get a port allocation failure. 
+> To check what process is using port 8000, run: `netstat -ano | findstr :8000`. To kill the process, run `taskkill /PID <PID> /F`. Run `docker compose down` before starting a new run.
+
+Choose one of the two deployment paths below:
+
+---
+
+### Path A: Fully Containerized Deployment (Recommended)
+
+This runs both the database and the FastAPI application server inside Docker.
+
+#### Step 1: Spin Up Containers
+```powershell
+docker compose up -d --build
+```
+
+#### Step 2: Run Database Migrations Inside Container
+```powershell
+docker compose exec web alembic upgrade head
+```
+
+#### Step 3: Load Brigade Transaction Data Inside Container
+```powershell
+docker compose exec -e PYTHONPATH=/app web python data/load_brigade_transactions.py
+```
+
+#### Step 4: Run E2E CCTV Validation Pipeline (on Host)
+This script processes the video frames locally (utilizing the host's Python environment for YOLO tracking speed) and streams the telemetry into the running Docker container:
+```powershell
+.venv\Scripts\activate
+$env:PYTHONPATH="."
+.venv\Scripts\python pipeline/run_cctv_validation.py
+```
+
+---
+
+### Path B: Local Developer Hybrid Deployment
+
+This runs only the PostgreSQL database in Docker, while the FastAPI server and ingestion pipeline run natively on your host machine.
+
+#### Step 1: Active Python Environment & Install Dependencies
 ```powershell
 .venv\Scripts\activate
 .venv\Scripts\python -m pip install -r requirements.txt
 ```
 
-### Step 2: Spin Up PostgreSQL Database Container
+#### Step 2: Spin Up ONLY the Database Container
 ```powershell
-docker compose up -d
+docker compose up -d db
 ```
 
-### Step 3: Run Database Migrations
+#### Step 3: Run Database Migrations Natively
 ```powershell
 $env:PYTHONPATH="."
 .venv\Scripts\alembic upgrade head
 ```
 
-### Step 4: Start Backend Application Server
+#### Step 4: Load Brigade Transaction Data Natively
+```powershell
+$env:PYTHONPATH="."
+.venv\Scripts\python data/load_brigade_transactions.py
+```
+
+#### Step 5: Start Backend Application Server Natively
 In a separate terminal:
 ```powershell
 $env:PYTHONPATH="."
 .venv\Scripts\uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000
 ```
 
-### Step 5: Execute Automated Verification Runner
-Processes 1000 video frames per camera, stitches tracks, runs event ingestion, database hydration, and prints store metrics:
+#### Step 6: Run CCTV Validation / Ingestion
 ```powershell
 $env:PYTHONPATH="."
-.venv\Scripts\python pipeline/e2e_verifier.py
+.venv\Scripts\python pipeline/run_cctv_validation.py
 ```
+
+---
 
 ---
 

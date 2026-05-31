@@ -1,5 +1,5 @@
 {
-  "proof_generated_at": "2026-05-31T12:40:39.420056+00:00",
+  "proof_generated_at": "2026-05-31T17:33:30.897855+00:00",
   "store_id": "STORE_VAL_01",
   "camera_id": "CAM_ENTRY_01",
   "video_file": "C:\\Users\\vaish\\retail-intelligence\\CCTV Footage\\CAM 1.mp4",
@@ -19,8 +19,8 @@
   "step_2_events_ingested": {
     "description": "POST /api/v1/events/ingest",
     "api_response": {
-      "ingested_count": 0,
-      "duplicate_count": 336,
+      "ingested_count": 336,
+      "duplicate_count": 0,
       "failed_count": 0,
       "errors": []
     }
@@ -50,7 +50,7 @@
       "avg_journey_length": 0.66,
       "avg_zones_visited": 0.66,
       "opportunity_zones": [],
-      "generated_at": "2026-05-31T12:40:39.150735Z"
+      "generated_at": "2026-05-31T17:33:29.838863Z"
     }
   },
   "step_5_single_visitor_proof": {
@@ -218,7 +218,7 @@
       }
     ],
     "hydrated_journey": {
-      "session_id": "2651f9f0-771b-49fa-9add-bac441e6c29f",
+      "session_id": "f36b76bc-cb2b-400b-81f8-a12d3a449dfb",
       "visitor_id": "VIS_001",
       "journey_path": [
         "SKINCARE"
