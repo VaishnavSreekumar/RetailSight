@@ -15,10 +15,10 @@ Physical retail store managers have historically lacked the precise, cohort-leve
 ```mermaid
 graph TD
     %% Styling
-    classDef edgeStyle fill:#e1f5fe,stroke:#039be5,stroke-width:2px;
-    classDef apiStyle fill:#e8f5e9,stroke:#43a047,stroke-width:2px;
-    classDef dbStyle fill:#fff3e0,stroke:#fb8c00,stroke-width:2px;
-    classDef outStyle fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
+    classDef edgeStyle fill:#e1f5fe,stroke:#039be5,stroke-width:2px,color:#000;
+    classDef apiStyle fill:#e8f5e9,stroke:#43a047,stroke-width:2px,color:#000;
+    classDef dbStyle fill:#fff3e0,stroke:#fb8c00,stroke-width:2px,color:#000;
+    classDef outStyle fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,color:#000;
 
     subgraph Edge ["In-Store Edge (Computer Vision)"]
         A["CCTV Camera Feeds"] --> B["YOLOv8 & ByteTrack<br>(Detects and Tracks People)"]
