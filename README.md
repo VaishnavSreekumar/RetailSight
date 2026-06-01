@@ -358,6 +358,5 @@ The validation produced:
 
 A separate clean-clone environment was used to verify that all required files, migrations, and datasets were available and reproducible.
 
-Repository URL: https://github.com/VaishnavSreekumar/RetailSight
 
 
