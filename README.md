@@ -1,6 +1,19 @@
 # Retail Intelligence Platform
 
-An in-store customer analytics and tracking telemetry engine that converts multi-camera CCTV video feeds into structured visitor journeys,Attributes checkout receipts, and reports conversion metrics, funnel drop-offs, and operational anomalies.
+An in-store customer analytics and tracking telemetry engine that converts multi-camera CCTV video feeds into structured visitor journeys, attributes checkout receipts, and reports conversion metrics, funnel drop-offs, and operational anomalies.
+
+## Technology Summary
+
+| Component | Choice |
+|------------|---------|
+| Detection | YOLOv8 Nano |
+| Tracking | ByteTrack |
+| Cross-Camera Correlation | Heuristic Correlation Engine |
+| Session Reconstruction | SessionHydrationService |
+| POS Attribution | Queue-Aware Temporal Matching |
+| API Framework | FastAPI |
+| Database | PostgreSQL |
+| Containerization | Docker Compose |
 
 ---
 
@@ -68,7 +81,7 @@ The platform is divided into two decoupled subsystems:
 ### A. Edge Computer Vision Pipeline
 * **YOLOv8 + ByteTrack**: Performs frame-by-frame person detection and tracking on local camera streams.
 * **Zone Engine (Shapely)**: Evaluates bounding box coordinates against physical store region polygons (Entrance corridor, Skincare aisle, Checkout billing queue).
-* **Correlation Engine**: Stitches local tracks across cameras using temporal and topological heuristics (Rules 1-4) to reconstruct global visitor paths.
+* **Correlation Engine**: Stitches local tracks across cameras using temporal and topological heuristics (Rules 1-4) to reconstruct global visitor paths. Deep Re-ID was intentionally avoided because the challenge prioritized explainability, reproducibility, and CPU-friendly execution over maximum identification accuracy.
 
 ### B. Cloud-Backend API Server
 * **FastAPI Web Server**: Serves endpoints for event ingestion, session hydration, and analytics metrics.
@@ -322,7 +335,19 @@ The Brigade Road store layout was mapped into business sections and linked to CC
 
 ---
 
-## 10. Known Limitations & Future Enhancements
+## 10. OpenCV Deployment Strategy
+
+* **Problem**: Running YOLOv8 inside Docker containers without GUI/X11 dependencies on lightweight Linux servers.
+* **Options Considered**:
+  * `opencv-python` (standard build, pulls in graphical shared library dependencies)
+  * `opencv-python-headless` (server build, excludes graphical dependencies)
+* **Decision**: Adopted `opencv-python-headless` as the baseline.
+* **Tradeoffs**: Removes direct GUI display/rendering functionality inside the container but significantly simplifies server-side deployment and avoids display-related runtime failures (`libxcb` / `libGL` missing library exceptions).
+* **Future Improvements**: Build GPU-enabled images for accelerated inference when deploying on edge devices with hardware acceleration.
+
+---
+
+## 11. Known Limitations & Future Enhancements
 
 * **Deterministic Cross-Camera Correlation**:
   * *Limitation*: Can confuse different tracks if multiple exits and entrances occur inside the same 5-second window.
@@ -336,7 +361,7 @@ The Brigade Road store layout was mapped into business sections and linked to CC
 
 ---
 
-## 11. Reproducibility Verification
+## 12. Reproducibility Verification
 
 The project was validated from a fresh Git clone in a separate workspace.
 
@@ -357,6 +382,18 @@ The validation produced:
 * Successful API responses from `/metrics`, `/executive-dashboard`, and `/shopper-behavior`
 
 A separate clean-clone environment was used to verify that all required files, migrations, and datasets were available and reproducible.
+
+---
+
+## 13. Architectural Principles
+
+The system was designed around five core pillars:
+
+1. **Explainability Over Black-Box Inference**: Preference for deterministic, rule-based heuristics in tracking and attribution matching, making results auditable and transparent.
+2. **CPU-First Execution**: Optimized for standard cloud/edge CPUs, allowing the full stack to run efficiently without GPU dependencies.
+3. **Reproducible Docker Deployment**: All service environments, system library packages, and database parameters are containerized to eliminate "works on my machine" failures.
+4. **Privacy-Preserving Shopper Analytics**: Visual streams are processed entirely at the edge, converting pixel data into coordinates and telemetry events. No biometric or face signatures are persisted.
+5. **Decoupled Event Ingestion and Session Reconstruction**: The telemetry capture API is decoupled from session logic, allowing high-throughput ingestion and asynchronous processing.
 
 
 
