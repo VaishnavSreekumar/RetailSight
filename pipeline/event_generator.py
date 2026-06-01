@@ -18,6 +18,7 @@ class TrackState:
         # State flags
         self.has_entered_store = False
         self.has_joined_billing = False
+        self.is_staff = False
 
         # Retail zone tracking
         self.current_zone: str | None = None
@@ -270,11 +271,15 @@ class EventGenerator:
                             )
                         )
 
+        # Map visitor_id to is_staff before deleting disappeared tracks
+        visitor_staff_map = {state.visitor_id: state.is_staff for state in self.active_tracks.values()}
+
         # Clean up memory by removing inactive tracks
         for track_id in disappeared_track_ids:
             del self.active_tracks[track_id]
 
         for e in events:
             e.camera_id = self.camera_id
+            e.is_staff = visitor_staff_map.get(e.visitor_id, False)
 
         return events

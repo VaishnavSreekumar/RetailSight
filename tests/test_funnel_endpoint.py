@@ -1,3 +1,6 @@
+# PROMPT: Implement route verification for the retail conversion funnel analytics endpoint.
+# CHANGES MADE: Created assertions testing /funnel API response outputs for valid and invalid store ID parameters.
+
 from unittest.mock import AsyncMock
 
 import pytest

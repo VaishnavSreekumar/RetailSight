@@ -23,6 +23,7 @@ class GeneratedEvent:
     store_id: str
     timestamp: str  # ISO-8601 string
     confidence: float
+    is_staff: bool = False
     event_id: str = field(default_factory=lambda: "")
     zone_id: str | None = None
     dwell_ms: int | None = None
@@ -40,6 +41,7 @@ class GeneratedEvent:
             "event_type": self.event_type,
             "timestamp": self.timestamp,
             "confidence": round(self.confidence, 4),
+            "is_staff": self.is_staff,
         }
         if self.zone_id is not None:
             data["zone_id"] = self.zone_id

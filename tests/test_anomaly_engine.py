@@ -1,3 +1,6 @@
+# PROMPT: Develop core rule engine tests for detecting retail store operational anomalies.
+# CHANGES MADE: Created assertions checking queue spikes, conversion rate drops, and dead zone alerts, verifying staff exclusion.
+
 from datetime import datetime, timezone
 import pytest
 

@@ -22,6 +22,7 @@ class ConversionEngine:
     @staticmethod
     def calculate_funnel(sessions: Sequence[Any]) -> dict[str, Any]:
         """Calculates store-wide visitor progression metrics through conversion milestones."""
+        sessions = [s for s in sessions if not _get_field(s, "is_staff", False)]
         entries = len(sessions)
         if entries == 0:
             return {
@@ -68,6 +69,7 @@ class ConversionEngine:
     @staticmethod
     def calculate_zone_effectiveness(sessions: Sequence[Any]) -> dict[str, dict[str, Any]]:
         """Computes counts, dwell averages, and conversion progression rates for each zone."""
+        sessions = [s for s in sessions if not _get_field(s, "is_staff", False)]
         # zone_id -> list of sessions that visited that zone
         zone_visits = {}
 
@@ -124,6 +126,7 @@ class ConversionEngine:
     @classmethod
     def analyze_opportunity_loss(cls, sessions: Sequence[Any]) -> list[dict[str, Any]]:
         """Identifies zones with high dwell times but low billing progression and purchase conversion rates."""
+        sessions = [s for s in sessions if not _get_field(s, "is_staff", False)]
         if not sessions:
             return []
 
@@ -183,6 +186,7 @@ class ConversionEngine:
     @classmethod
     def calculate_store_metrics(cls, sessions: Sequence[Any]) -> dict[str, Any]:
         """Calculates store-wide metrics for a cohort of visitor sessions."""
+        sessions = [s for s in sessions if not _get_field(s, "is_staff", False)]
         if not sessions:
             return {
                 "visitors": 0,
@@ -256,6 +260,7 @@ class ConversionEngine:
     @classmethod
     def calculate_funnel_steps(cls, sessions: Sequence[Any]) -> list[dict[str, Any]]:
         """Calculates cohort-based conversion funnel steps with relative preceding-stage rates."""
+        sessions = [s for s in sessions if not _get_field(s, "is_staff", False)]
         entries = len(sessions)
         if entries == 0:
             return [

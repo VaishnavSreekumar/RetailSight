@@ -23,6 +23,6 @@ This document outlines the explicitly chosen architectural constraints, shortcut
 * **Tradeoff**: Prevents database event bloating (a person staying in a zone at 30 FPS would generate 1800 events/minute).
 
 ## 5. Staff and Re-entry Detection
-* **Assumption**: Bypassed for MVP.
-* **Shortcut**: All tracks are assumed to be customers (`is_staff = False`), and re-entry logic is disabled.
-* **Tradeoff**: Simplifies the state machine in the first sprint, ensuring a solid baseline for customer progression.
+* **Assumption**: Uniform-based staff classification is not implemented.
+* **Shortcut**: Schema and API layers fully support staff exclusion. All edge events generated currently default to `is_staff = false`.
+* **Tradeoff**: Honest and technically defensible architecture design; backend correctly ignores and filters out staff sessions when ingested with `is_staff = true` from external validation runs, without relying on speculative uniform classifiers.

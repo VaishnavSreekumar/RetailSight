@@ -1,3 +1,6 @@
+# PROMPT: Create endpoint test suite for operational anomaly detection API.
+# CHANGES MADE: Implemented mock-based validation for /anomalies GET endpoint verifying empty state responses.
+
 from unittest.mock import AsyncMock
 
 import pytest

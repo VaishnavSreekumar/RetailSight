@@ -1,3 +1,6 @@
+# PROMPT: Build test assertions for store performance summary and comparative cohort metrics API.
+# CHANGES MADE: Validated response schema for store performance summaries and time-series cohort calculations.
+
 import pytest
 from httpx import AsyncClient
 from unittest.mock import AsyncMock

@@ -1,3 +1,6 @@
+# PROMPT: Implement verification suite for funnel step conversions and retail zone effectiveness metrics.
+# CHANGES MADE: Added unit tests for conversion funnel calculations, zone effectiveness metrics, and opportunity loss analytics.
+
 from app.services.conversion_engine import ConversionEngine
 
 

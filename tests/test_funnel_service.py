@@ -1,3 +1,6 @@
+# PROMPT: Create service-layer test suite for the conversion funnel calculation metrics, ensuring staff exclusion.
+# CHANGES MADE: Implemented unit tests verifying visitor progression through funnel stages, and asserting complete exclusion of staff sessions.
+
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock
 
@@ -113,3 +116,47 @@ async def test_funnel_service_calculations(funnel_service, mock_session_repo) ->
     assert steps[3]["step_name"] == "Completed Purchase"
     assert steps[3]["visitor_count"] == 1
     assert steps[3]["conversion_rate"] == 50.0
+
+
+@pytest.mark.asyncio
+async def test_funnel_service_excludes_staff(funnel_service, mock_session_repo) -> None:
+    """Verifies that sessions flagged as staff (is_staff=True) are completely excluded from calculated funnel steps."""
+    sessions = [
+        # Customer session: Store entry, Browsing Zones, Checkout, Converted
+        VisitorSession(
+            id=VisitorSession.id.default.arg,
+            visitor_id="VIS_cust01",
+            store_id="STORE_BLR_002",
+            entered_at=datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+            exited_at=datetime(2026, 5, 30, 10, 5, 0, tzinfo=timezone.utc),
+            journey_path=["zone_apparel"],
+            zone_dwell_times={"zone_apparel": 100000},
+            has_joined_billing_queue=True,
+            has_converted=True,
+            is_staff=False,
+        ),
+        # Staff session (should be completely omitted)
+        VisitorSession(
+            id=VisitorSession.id.default.arg,
+            visitor_id="VIS_staff01",
+            store_id="STORE_BLR_002",
+            entered_at=datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+            exited_at=datetime(2026, 5, 30, 10, 10, 0, tzinfo=timezone.utc),
+            journey_path=["zone_apparel"],
+            zone_dwell_times={"zone_apparel": 200000},
+            has_joined_billing_queue=True,
+            has_converted=True,
+            is_staff=True,
+        ),
+    ]
+    mock_session_repo.get_by_store_and_timerange.return_value = sessions
+
+    res = await funnel_service.get_store_funnel("STORE_BLR_002")
+
+    steps = res["steps"]
+    
+    # Check that counts only reflect the single customer session
+    assert steps[0]["visitor_count"] == 1
+    assert steps[1]["visitor_count"] == 1
+    assert steps[2]["visitor_count"] == 1
+    assert steps[3]["visitor_count"] == 1

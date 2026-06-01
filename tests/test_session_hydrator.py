@@ -1,3 +1,6 @@
+# PROMPT: Implement unit tests for the core SessionHydrator event sequence parsing state machine.
+# CHANGES MADE: Asserted chronological assembly of entry, zone transition, and exit events into logical visitor sessions, verifying staff exclusion flag propagation.
+
 from datetime import datetime, timezone
 
 from app.services.session_hydrator import SessionHydrator

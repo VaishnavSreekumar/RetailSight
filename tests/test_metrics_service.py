@@ -1,3 +1,6 @@
+# PROMPT: Create service-layer test suite for calculating core store performance KPIs, ensuring staff exclusion.
+# CHANGES MADE: Implemented unit tests verifying visitors, dwell time, and conversion metrics calculation while asserting staff exclusion.
+
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock
 
@@ -159,3 +162,48 @@ async def test_metrics_service_retail_zone_filtering(
     assert res["avg_journey_length"] == 5.0
     # avg_zones_visited counts only retail zones ("zone_electronics", "zone_apparel"): 2
     assert res["avg_zones_visited"] == 2.0
+
+
+@pytest.mark.asyncio
+async def test_metrics_service_excludes_staff(
+    metrics_service, mock_session_repo, mock_txn_repo
+) -> None:
+    """Verifies that sessions flagged as staff (is_staff=True) are completely excluded from calculated metrics."""
+    sessions = [
+        # Customer session (engaged, converted, dwell 300s)
+        VisitorSession(
+            id=VisitorSession.id.default.arg,
+            visitor_id="VIS_cust01",
+            store_id="STORE_BLR_002",
+            entered_at=datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+            exited_at=datetime(2026, 5, 30, 10, 5, 0, tzinfo=timezone.utc),
+            journey_path=["zone_electronics"],
+            zone_dwell_times={"zone_electronics": 300000},
+            has_joined_billing_queue=True,
+            has_converted=True,
+            is_staff=False,
+        ),
+        # Staff session (should be ignored)
+        VisitorSession(
+            id=VisitorSession.id.default.arg,
+            visitor_id="VIS_staff01",
+            store_id="STORE_BLR_002",
+            entered_at=datetime(2026, 5, 30, 10, 0, 0, tzinfo=timezone.utc),
+            exited_at=datetime(2026, 5, 30, 10, 10, 0, tzinfo=timezone.utc),
+            journey_path=["zone_electronics"],
+            zone_dwell_times={"zone_electronics": 600000},
+            has_joined_billing_queue=True,
+            has_converted=True,
+            is_staff=True,
+        ),
+    ]
+    mock_session_repo.get_by_store_and_timerange.return_value = sessions
+
+    res = await metrics_service.get_store_metrics("STORE_BLR_002")
+
+    # Metrics should only count the 1 customer session, completely ignoring the staff session
+    assert res["visitors"] == 1
+    assert res["engaged_visitors"] == 1
+    assert res["purchases"] == 1
+    assert res["conversion_rate"] == 100.0
+    assert res["avg_session_dwell_ms"] == 300000.0

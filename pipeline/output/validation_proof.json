@@ -1,26 +1,26 @@
 {
-  "proof_generated_at": "2026-06-01T05:35:06.885490+00:00",
+  "proof_generated_at": "2026-06-01T11:52:32.378369+00:00",
   "store_id": "STORE_VAL_01",
   "camera_id": "CAM_ENTRY_01",
-  "video_file": "/app/CCTV Footage/CAM 1.mp4",
+  "video_file": "C:\\Users\\vaish\\retail-intelligence\\CCTV Footage\\CAM 1.mp4",
   "frames_processed": 4193,
   "step_1_video_to_events": {
     "description": "Real YOLOv8n tracker ran on actual MP4 frames. EventGenerator state machine converted tracks to events.",
-    "total_events_generated": 355,
-    "unique_visitor_ids": 74,
+    "total_events_generated": 336,
+    "unique_visitor_ids": 68,
     "event_types": {
-      "ENTRY": 74,
-      "EXIT": 69,
-      "ZONE_DWELL": 112,
-      "ZONE_ENTER": 52,
-      "ZONE_EXIT": 48
+      "ENTRY": 68,
+      "EXIT": 63,
+      "ZONE_DWELL": 111,
+      "ZONE_ENTER": 49,
+      "ZONE_EXIT": 45
     }
   },
   "step_2_events_ingested": {
     "description": "POST /api/v1/events/ingest",
     "api_response": {
-      "ingested_count": 355,
-      "duplicate_count": 0,
+      "ingested_count": 300,
+      "duplicate_count": 36,
       "failed_count": 0,
       "errors": []
     }
@@ -28,7 +28,7 @@
   "step_3_sessions_hydrated": {
     "description": "POST /api/v1/stores/{store_id}/hydrate \u2014 SessionHydrationService aggregates events into VisitorSession rows.",
     "api_response": {
-      "hydrated_count": 74,
+      "hydrated_count": 133,
       "linked_count": 0
     }
   },
@@ -41,16 +41,16 @@
     "formula_abandonment_rate": "((queue_entries - purchases) / queue_entries)  \u2192 fraction [0, 1]",
     "live_metrics": {
       "store_id": "STORE_VAL_01",
-      "visitors": 74,
-      "engaged_visitors": 49,
+      "visitors": 133,
+      "engaged_visitors": 86,
       "billing_queue_visitors": 0,
       "purchases": 0,
       "conversion_rate": 0.0,
-      "avg_session_dwell_ms": 6140.4,
-      "avg_journey_length": 0.66,
-      "avg_zones_visited": 0.66,
+      "avg_session_dwell_ms": 5530.05,
+      "avg_journey_length": 0.65,
+      "avg_zones_visited": 0.65,
       "opportunity_zones": [],
-      "generated_at": "2026-06-01T05:35:06.812543Z"
+      "generated_at": "2026-06-01T11:52:31.753027Z"
     }
   },
   "step_5_single_visitor_proof": {
@@ -63,7 +63,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ENTRY",
         "timestamp": "2026-05-31T12:00:00+00:00",
-        "confidence": 0.8325,
+        "confidence": 0.8384,
+        "is_staff": false,
         "camera_id": "CAM_ENTRY_01"
       },
       {
@@ -72,7 +73,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_ENTER",
         "timestamp": "2026-05-31T12:00:00.300300+00:00",
-        "confidence": 0.8378,
+        "confidence": 0.841,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "camera_id": "CAM_ENTRY_01"
       },
@@ -82,7 +84,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:05.305300+00:00",
-        "confidence": 0.802,
+        "confidence": 0.8008,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -93,7 +96,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:10.310300+00:00",
-        "confidence": 0.7962,
+        "confidence": 0.7951,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -104,7 +108,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:15.315300+00:00",
-        "confidence": 0.7982,
+        "confidence": 0.7956,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -115,7 +120,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:20.320300+00:00",
-        "confidence": 0.7921,
+        "confidence": 0.7895,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -126,7 +132,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:25.325300+00:00",
-        "confidence": 0.7879,
+        "confidence": 0.7854,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -137,7 +144,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:30.330300+00:00",
-        "confidence": 0.7883,
+        "confidence": 0.7865,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -148,7 +156,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:35.335300+00:00",
-        "confidence": 0.7868,
+        "confidence": 0.7849,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -159,7 +168,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:40.340300+00:00",
-        "confidence": 0.7794,
+        "confidence": 0.7764,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -170,7 +180,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:45.345300+00:00",
-        "confidence": 0.7752,
+        "confidence": 0.7709,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -181,7 +192,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:50.350300+00:00",
-        "confidence": 0.769,
+        "confidence": 0.7651,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 5005,
         "camera_id": "CAM_ENTRY_01"
@@ -192,7 +204,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_EXIT",
         "timestamp": "2026-05-31T12:00:51.251200+00:00",
-        "confidence": 0.7672,
+        "confidence": 0.7633,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "camera_id": "CAM_ENTRY_01"
       },
@@ -202,7 +215,8 @@
         "visitor_id": "VIS_001",
         "event_type": "ZONE_DWELL",
         "timestamp": "2026-05-31T12:00:51.251200+00:00",
-        "confidence": 0.7672,
+        "confidence": 0.7633,
+        "is_staff": false,
         "zone_id": "SKINCARE",
         "dwell_ms": 900,
         "camera_id": "CAM_ENTRY_01"
@@ -213,12 +227,13 @@
         "visitor_id": "VIS_001",
         "event_type": "EXIT",
         "timestamp": "2026-05-31T12:00:51.251200+00:00",
-        "confidence": 0.7672,
+        "confidence": 0.7633,
+        "is_staff": false,
         "camera_id": "CAM_ENTRY_01"
       }
     ],
     "hydrated_journey": {
-      "session_id": "76af8848-13ef-48c4-bee5-af7078f28fca",
+      "session_id": "ed9ecd6d-cb20-4028-873c-9ba93940bd6b",
       "visitor_id": "VIS_001",
       "journey_path": [
         "SKINCARE"

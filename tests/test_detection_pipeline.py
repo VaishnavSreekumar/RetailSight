@@ -1,3 +1,6 @@
+# PROMPT: Design testing harness for YOLOv8 object detection and ByteTrack tracking pipeline.
+# CHANGES MADE: Mocked CV pipeline processing loops to assert track creation and object confidence calculation reliability.
+
 from datetime import datetime, timezone
 import pytest
 from shapely.geometry import Polygon

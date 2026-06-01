@@ -12,6 +12,7 @@ class AnomalyEngine:
         self, sessions: Sequence[Any], evaluation_time: datetime | None = None
     ) -> list[dict[str, Any]]:
         """Orchestrates queue spike, conversion drop, and dead zone anomaly checks."""
+        sessions = [s for s in sessions if not _get_field(s, "is_staff", False)]
         if not sessions:
             return []
 

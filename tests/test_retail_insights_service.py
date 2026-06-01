@@ -1,3 +1,6 @@
+# PROMPT: Design unit tests for raw POS transaction and SKU performance parsing from Excel/CSV files.
+# CHANGES MADE: Asserted correct parsing of GMV, NMV, discounts, and salesperson metrics from local Brigade transaction datasets.
+
 import pytest
 from app.services.retail_insights_service import RetailInsightsService
 from app.schemas.insights import (

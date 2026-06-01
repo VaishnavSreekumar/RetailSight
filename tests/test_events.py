@@ -1,3 +1,6 @@
+# PROMPT: Implement event ingestion and validation endpoint tests.
+# CHANGES MADE: Validated batch event ingestion API with standard formatting schema checks and idempotency constraints.
+
 from unittest.mock import AsyncMock
 
 import pytest

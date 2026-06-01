@@ -1,3 +1,6 @@
+# PROMPT: Build cross-camera tracking correlation tests to verify multi-camera visitor journeys.
+# CHANGES MADE: Verified path stitching heuristics across camera streams based on exit/entry timeouts and physical store layout constraints.
+
 from datetime import datetime, timezone, timedelta
 import pytest
 from httpx import AsyncClient

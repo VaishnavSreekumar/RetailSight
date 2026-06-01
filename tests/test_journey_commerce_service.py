@@ -1,3 +1,6 @@
+# PROMPT: Build service-layer tests for linking in-store visitor paths with POS transaction receipts.
+# CHANGES MADE: Asserted correctness of transaction matcher and zone conversion metrics attribution.
+
 import pytest
 from unittest.mock import AsyncMock
 from app.repositories.session_repository import SessionRepository

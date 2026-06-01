@@ -1,3 +1,6 @@
+# PROMPT: Implement integration tests for the store-wide analytics metrics endpoint.
+# CHANGES MADE: Validated /metrics API behavior verifying response calculations for active shopper sessions.
+
 from unittest.mock import AsyncMock
 
 import pytest

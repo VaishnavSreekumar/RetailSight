@@ -1,3 +1,6 @@
+# PROMPT: Create verification suite for the store executive performance dashboard endpoint.
+# CHANGES MADE: Implemented route tests for /executive-dashboard API, validating key-value structure of aggregated metrics.
+
 import pytest
 from httpx import AsyncClient
 from fastapi import status
