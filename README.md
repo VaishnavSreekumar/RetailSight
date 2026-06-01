@@ -317,8 +317,8 @@ The Brigade Road store layout was mapped into business sections and linked to CC
 ![Validation Run Output](docs/screenshots/validation_run.png)
 
 ### Shopper Analytics Dashboard Mockups
-![Shopper Behavior Analytics](docs/screenshots/val1.png)
-![Executive Dashboard Metrics](docs/screenshots/val2.png)
+![Shopper Behavior Analytics](docs/screenshots/shopper_behavior_dashboard.png)
+![Executive Dashboard Metrics](docs/screenshots/executive_dashboard.png)
 
 ---
 

@@ -1,5 +1,7 @@
 # Replication & Demo Guide
 
+**Estimated Demo Time: 2–3 minutes**
+
 This guide provides the exact command sequence to start the database, execute migrations, load datasets, run the computer vision pipeline on camera feeds, and query all analytics APIs.
 
 ---
@@ -36,17 +38,49 @@ This script runs YOLOv8 tracking on the real CCTV footage (`CCTV Footage/CAM 1.m
   * Unique Visitors: 74
   * Sessions Hydrated: 74
 
-### Step 5: Verify Analytics APIs
-You can immediately query the root-level endpoints exposed directly for reviewer convenience:
+### Step 5: Start the API Application Server
+Before calling the APIs, ensure the FastAPI server is running:
 ```powershell
-# 1. Retrieve visitor counts, conversion rate, and average session dwell time
+$env:PYTHONPATH="."
+.venv\Scripts\uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000
+```
+
+### Step 6: Verify Analytics APIs
+Open a separate terminal and run the following curl requests:
+
+```powershell
+# 1. Query general store metrics
 curl http://127.0.0.1:8000/metrics
 
-# 2. Retrieve CCTV shopper metrics matched against POS sales
+# 2. Query CCTV shopper metrics matched against POS sales
 curl http://127.0.0.1:8000/shopper-behavior
 
-# 3. Retrieve section performance breakdown, top brands, and salesperson sales
+# 3. Query section performance breakdown, top brands, and salesperson sales
 curl http://127.0.0.1:8000/executive-dashboard
+```
+
+#### Expected Metrics Output (`/metrics`)
+```json
+{
+  "store_id": "STORE_VAL_01",
+  "visitors": 74,
+  "engaged_visitors": 49,
+  "billing_queue_visitors": 0,
+  "purchases": 0,
+  "conversion_rate": 0.0,
+  "avg_session_dwell_ms": 6140.4
+}
+```
+
+#### Expected Executive Dashboard Output (`/executive-dashboard`)
+```json
+{
+  "revenue": {
+    "nmv": 34831.74,
+    "gmv": 44920.00,
+    "abv": 1451.32
+  }
+}
 ```
 
 ---
@@ -145,5 +179,17 @@ curl http://127.0.0.1:8000/api/v1/stores/STORE_VAL_01/correlations
 The validation pipeline output and dashboard responses can be visually reviewed using the screenshots stored under [docs/screenshots/](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/):
 
 * **Validation Run Execution**: [validation_run.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/validation_run.png) shows the console output of the YOLOv8 validation script processing 4,193 frames.
-* **Shopper Analytics Dashboard**: [val1.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/val1.png) shows the shopper behavior correlation dashboard.
-* **Executive Performance Dashboard**: [val2.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/val2.png) shows layout section sales, ABV, and conversion trends.
+* **Shopper Analytics Dashboard**: [shopper_behavior_dashboard.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/shopper_behavior_dashboard.png) shows the shopper behavior correlation dashboard.
+* **Executive Performance Dashboard**: [executive_dashboard.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/executive_dashboard.png) shows layout section sales, ABV, and conversion trends.
+
+---
+
+## 5. Final Verification Checklist
+
+- [ ] Docker containers running (`docker compose ps` shows `retail_intel_db` and `retail_intel_api` running)
+- [ ] Database migrations applied successfully
+- [ ] Brigade transaction dataset loaded successfully (101 items, INR 34,831.74 total revenue)
+- [ ] CCTV validation completed (processed 4193 frames → 355 events)
+- [ ] `/metrics` endpoint responding with 74 visitors
+- [ ] `/shopper-behavior` endpoint responding with engagement dwell times
+- [ ] `/executive-dashboard` endpoint responding with NMV breakdown matching loaded POS dataset
