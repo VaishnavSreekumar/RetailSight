@@ -82,6 +82,7 @@ def run_video_pipeline(
     store_id: str,
     camera_id: str,
     max_frames: int = 500,
+    live: bool = False,
 ) -> list[dict]:
     """
     Process a real MP4 video with YOLOv8 tracking and generate events.
@@ -115,6 +116,16 @@ def run_video_pipeline(
     frame_idx = 0
     t0 = time.time()
 
+    if live:
+        try:
+            httpx.post(f"{BACKEND}/pipeline/status", json={
+                "status": "running",
+                "frames_processed": 0,
+                "total_frames": max_frames
+            }, timeout=2.0)
+        except Exception as ex:
+            print(f"[PIPELINE STATUS ERROR] Failed to initialize progress status: {ex}")
+
     while frame_idx < max_frames:
         ok, frame = cap.read()
         if not ok:
@@ -124,7 +135,26 @@ def run_video_pipeline(
         events = event_gen.process_frame(frame_idx, tracks_raw)
 
         for e in events:
-            all_events.append(e.to_dict())
+            evt_dict = e.to_dict()
+            all_events.append(evt_dict)
+            if live:
+                try:
+                    # Stream single event immediately
+                    httpx.post(f"{BACKEND}/events/ingest", json={"events": [evt_dict]}, timeout=2.0)
+                    # Trigger session hydration so metrics update on dashboard
+                    httpx.post(f"{BACKEND}/stores/{store_id}/hydrate", timeout=2.0)
+                except Exception as ex:
+                    print(f"\n[PIPELINE STREAM ERROR] Failed to send event to API: {ex}")
+
+        if live and (frame_idx % 20 == 0 or frame_idx == max_frames - 1):
+            try:
+                httpx.post(f"{BACKEND}/pipeline/status", json={
+                    "status": "running",
+                    "frames_processed": frame_idx + 1,
+                    "total_frames": max_frames
+                }, timeout=1.0)
+            except Exception:
+                pass
 
         if frame_idx % 100 == 0:
             elapsed = time.time() - t0
@@ -137,6 +167,17 @@ def run_video_pipeline(
     cap.release()
     elapsed = time.time() - t0
     print(f"[PIPELINE] Done. Processed {frame_idx} frames in {elapsed:.1f}s → {len(all_events)} events")
+
+    if live:
+        try:
+            httpx.post(f"{BACKEND}/pipeline/status", json={
+                "status": "completed",
+                "frames_processed": frame_idx,
+                "total_frames": max_frames
+            }, timeout=2.0)
+        except Exception:
+            pass
+
     return all_events
 
 
@@ -274,6 +315,12 @@ async def main() -> None:
     print("  Sprint 24 – CCTV Validation End-to-End Proof")
     print("=" * 60)
 
+    import argparse
+    parser = argparse.ArgumentParser(description="Run CCTV Validation Pipeline")
+    parser.add_argument("--live", action="store_true", help="Ingest events and update dashboard in real time")
+    args = parser.parse_args()
+    live = args.live
+
     # ── Step 1: Run real video pipeline ──────────────────────────────────────
     if not os.path.exists(VIDEO_PATH):
         print(f"ERROR: Video not found at {VIDEO_PATH}")
@@ -285,6 +332,7 @@ async def main() -> None:
         store_id=STORE_ID,
         camera_id=CAMERA_ID,
         max_frames=MAX_FRAMES,
+        live=live,
     )
 
     if not events:

@@ -175,6 +175,23 @@ $env:PYTHONPATH="."
 
 ---
 
+### 3.1. Live Interactive Dashboard (Bonus +10)
+
+The platform features an interactive real-time analytical dashboard that visualizes store metrics updating live on screen while the computer vision pipeline is actively processing video frames.
+
+#### How to run the Live Dashboard Demo:
+1. Start the backend API server (either Path A Docker or Path B local uvicorn: `uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000`).
+2. Open your web browser to: **[http://127.0.0.1:8000/dashboard](http://127.0.0.1:8000/dashboard)**. The dashboard will load in an idle state (all counters at 0).
+3. Open a separate terminal and run the validation pipeline with the `--live` streaming flag:
+   ```powershell
+   $env:PYTHONPATH="."
+   .venv\Scripts\python pipeline/run_cctv_validation.py --live
+   ```
+4. Place the browser window and terminal window side-by-side. You will see the **Frames Processed** progress bar incrementing frame-by-frame (e.g. `1,450 / 4,193`), and the **Events Ingested**, **Visitor Sessions**, **Engaged Shoppers**, **Dwell Time**, and **POS Revenue** updating automatically every second without manual page refresh.
+
+---
+
+
 ---
 
 ## 4. API Overview

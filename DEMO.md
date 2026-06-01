@@ -27,16 +27,24 @@ $env:PYTHONPATH="."
 ```
 
 ### Step 4: Run E2E CCTV Validation Pipeline
-This script runs YOLOv8 tracking on the real CCTV footage (`CCTV Footage/CAM 1.mp4`), generates telemetry events, ingests them into the database, and triggers session hydration:
-```powershell
-.venv\Scripts\python pipeline/run_cctv_validation.py
-```
+This script runs YOLOv8 tracking on the real CCTV footage (`CCTV Footage/CAM 1.mp4`), generates telemetry events, ingests them into the database, and triggers session hydration.
 
-* **Expected Clean-Run Validation Results**:
-  * Frames Processed: 4193
-  * Events Generated: 336
-  * Unique Visitors: 68
-  * Sessions Hydrated: 68
+*   **Standard Run**:
+    ```powershell
+    .venv\Scripts\python pipeline/run_cctv_validation.py
+    ```
+*   **Live Dashboard Run (Bonus Showcase)**:
+    Open your browser to **[http://127.0.0.1:8000/dashboard](http://127.0.0.1:8000/dashboard)** first, then run:
+    ```powershell
+    .venv\Scripts\python pipeline/run_cctv_validation.py --live
+    ```
+    *Place the terminal and browser side-by-side to watch the progress bar and database counters update live in real-time!*
+
+*   **Expected Clean-Run Validation Results**:
+    *   Frames Processed: 4193
+    *   Events Generated: 336
+    *   Unique Visitors: 68
+    *   Sessions Hydrated: 68
 
 ### Step 5: Start the API Application Server
 Before calling the APIs, ensure the FastAPI server is running:
