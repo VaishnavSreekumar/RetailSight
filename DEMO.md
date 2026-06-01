@@ -1,15 +1,61 @@
-# Replication & Demo Guide - DEMO.md
+# Replication & Demo Guide
 
-This guide provides the exact command sequence to start the database, execute migrations, run the computer vision pipeline on camera feeds, and query all analytics APIs.
+This guide provides the exact command sequence to start the database, execute migrations, load datasets, run the computer vision pipeline on camera feeds, and query all analytics APIs.
+
+---
+
+# Quick Start (60-Second Judge Path)
+
+If you are a judge or reviewer looking for the fastest verification path, execute the following sequence:
+
+### Step 1: Spin Up Containers
+```powershell
+docker compose up -d
+```
+
+### Step 2: Apply Database Schema Migrations
+```powershell
+$env:PYTHONPATH="."
+.venv\Scripts\alembic upgrade head
+```
+
+### Step 3: Load Brigade POS Transaction Dataset
+```powershell
+.venv\Scripts\python data/load_brigade_transactions.py
+```
+
+### Step 4: Run E2E CCTV Validation Pipeline
+This script runs YOLOv8 tracking on the real CCTV footage (`CCTV Footage/CAM 1.mp4`), generates telemetry events, ingests them into the database, and triggers session hydration:
+```powershell
+.venv\Scripts\python pipeline/run_cctv_validation.py
+```
+
+* **Expected Clean-Run Validation Results**:
+  * Frames Processed: 4193
+  * Events Generated: 355
+  * Unique Visitors: 74
+  * Sessions Hydrated: 74
+
+### Step 5: Verify Analytics APIs
+You can immediately query the root-level endpoints exposed directly for reviewer convenience:
+```powershell
+# 1. Retrieve visitor counts, conversion rate, and average session dwell time
+curl http://127.0.0.1:8000/metrics
+
+# 2. Retrieve CCTV shopper metrics matched against POS sales
+curl http://127.0.0.1:8000/shopper-behavior
+
+# 3. Retrieve section performance breakdown, top brands, and salesperson sales
+curl http://127.0.0.1:8000/executive-dashboard
+```
 
 ---
 
 ## 1. Environment Setup
 
-All commands must be executed in **PowerShell** from the project root folder `c:\Users\vaish\retail-intelligence`.
+All commands should be executed in **PowerShell** from the project root folder `c:\Users\vaish\retail-intelligence`.
 
-### Step 1: Active Python Environment
-Ensure virtual environment is active and dependencies are installed:
+### Step 1: Activate Python Environment & Install Dependencies
 ```powershell
 # Activate environment
 .venv\Scripts\activate
@@ -19,13 +65,11 @@ Ensure virtual environment is active and dependencies are installed:
 ```
 
 ### Step 2: Spin Up Docker Database Container
-Start the PostgreSQL database service in the background:
 ```powershell
 docker compose up -d
 ```
 
 ### Step 3: Run Database Migrations
-Execute Alembic migrations to set up the SQL schemas:
 ```powershell
 $env:PYTHONPATH="."
 .venv\Scripts\alembic upgrade head
@@ -43,13 +87,19 @@ $env:PYTHONPATH="."
 ```
 Keep this server terminal running.
 
-### Step 2: Run CV Detection, Stitching & Ingestion
-Execute the automated verifier script. It runs YOLOv8 tracking on the camera videos, performs track stitching, ingests events to the database, hydrates sessions, and attributes POS transactions:
+### Step 2: Populate Brigade Transaction Data
+Run the loader script to populate the database with the real POS transactions from Brigade Road (ST1008):
 ```powershell
-$env:PYTHONPATH="."
-.venv\Scripts\python pipeline/e2e_verifier.py
+.venv\Scripts\python data/load_brigade_transactions.py
 ```
-Wait for the CV runs on CAM1, CAM2, and CAM4 to complete. Once finished, it will display the output metrics summary in your terminal.
+This script cleans the raw CSV, maps products to layout sections, and inserts them into the `brigade_transactions` table in PostgreSQL.
+
+### Step 3: Run CCTV Video Validation
+Run the real video validation pipeline to process coordinates, generate events, and hydrate visitor sessions:
+```powershell
+.venv\Scripts\python pipeline/run_cctv_validation.py
+```
+This will process the entire `CAM 1.mp4` video (4,193 frames) using YOLOv8 person tracking and register the shopper sessions.
 
 ---
 
@@ -57,47 +107,43 @@ Wait for the CV runs on CAM1, CAM2, and CAM4 to complete. Once finished, it will
 
 Verify database states and analytics by executing these `curl` commands in your terminal:
 
-### A. Query Store Metrics
+### A. Root-Level Reviewer Endpoints (Direct & Convenient)
 ```powershell
-curl http://127.0.0.1:8000/api/v1/stores/STORE_E2E_01/metrics
+# Query general store metrics (visitors, conversion rate)
+curl http://127.0.0.1:8000/metrics
+
+# Query shopper behavioral correlations (dwell time vs section sales)
+curl http://127.0.0.1:8000/shopper-behavior
+
+# Query executive dashboard layout analytics
+curl http://127.0.0.1:8000/executive-dashboard
 ```
 
-### B. Query Conversion Funnel Cohort
+### B. Namespaced API Endpoint Details (`/api/v1/stores/...`)
+If you want to query specific stores dynamically:
 ```powershell
-curl http://127.0.0.1:8000/api/v1/stores/STORE_E2E_01/funnel
-```
+# Query specific store metrics
+curl http://127.0.0.1:8000/api/v1/stores/STORE_VAL_01/metrics
 
-### C. Query Active Anomalies
-```powershell
-curl http://127.0.0.1:8000/api/v1/stores/STORE_E2E_01/anomalies
-```
+# Query conversion funnel cohort
+curl http://127.0.0.1:8000/api/v1/stores/STORE_VAL_01/funnel
 
-### D. Query Customer Journey Audits
-```powershell
-curl http://127.0.0.1:8000/api/v1/stores/STORE_E2E_01/journeys
-```
+# Query active operational anomalies
+curl http://127.0.0.1:8000/api/v1/stores/STORE_VAL_01/anomalies
 
-### E. Query Cross-Camera Correlation Mappings
-```powershell
-curl http://127.0.0.1:8000/api/v1/stores/STORE_E2E_01/correlations
+# Query customer journey diagnostics
+curl http://127.0.0.1:8000/api/v1/stores/STORE_VAL_01/journeys
+
+# Query cross-camera correlation mappings
+curl http://127.0.0.1:8000/api/v1/stores/STORE_VAL_01/correlations
 ```
 
 ---
 
-## Demo Flow
+## 4. Visual Layout & Analytics Screenshots
 
-### 4. Data Loading (New)
+The validation pipeline output and dashboard responses can be visually reviewed using the screenshots stored under [docs/screenshots/](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/):
 
-To populate the system with the challenge dataset, run the provided loader script. This only needs to be done once.
-
-```bash
-python -m data.load_brigade_transactions
-```
-
-This command will:
-- Read the `Brigade_Bangalore_10_April_26 (1)bc6219c (1).csv` file.
-- Clean and validate the data.
-- Load it into the `transactions` table in your PostgreSQL database.
-- Print a verification of row counts and total revenue.
-
-### 5. Run E2E Verification
+* **Validation Run Execution**: [validation_run.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/validation_run.png) shows the console output of the YOLOv8 validation script processing 4,193 frames.
+* **Shopper Analytics Dashboard**: [val1.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/val1.png) shows the shopper behavior correlation dashboard.
+* **Executive Performance Dashboard**: [val2.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/val2.png) shows layout section sales, ABV, and conversion trends.
