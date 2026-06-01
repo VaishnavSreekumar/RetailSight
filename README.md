@@ -311,7 +311,18 @@ The Brigade Road store layout was mapped into business sections and linked to CC
 
 ---
 
-## 9. Known Limitations & Future Enhancements
+## 9. System Screenshots
+
+### CCTV End-to-End Ingestion & Hydration Execution
+![Validation Run Output](docs/screenshots/validation_run.png)
+
+### Shopper Analytics Dashboard Mockups
+![Shopper Behavior Analytics](docs/screenshots/val1.png)
+![Executive Dashboard Metrics](docs/screenshots/val2.png)
+
+---
+
+## 10. Known Limitations & Future Enhancements
 
 * **Deterministic Cross-Camera Correlation**:
   * *Limitation*: Can confuse different tracks if multiple exits and entrances occur inside the same 5-second window.
@@ -325,7 +336,7 @@ The Brigade Road store layout was mapped into business sections and linked to CC
 
 ---
 
-## 10. Reproducibility Verification
+## 11. Reproducibility Verification
 
 The project was validated from a fresh Git clone in a separate workspace.
 
@@ -341,8 +352,8 @@ docker compose exec web python pipeline/run_cctv_validation.py
 
 The validation produced:
 
-* 336 generated events
-* 68 hydrated visitor sessions
+* 355 generated events (355 events successfully ingested, 0 duplicates on first clean run)
+* 74 hydrated visitor sessions (perfectly matching the 74 unique visitors detected)
 * Successful API responses from `/metrics`, `/executive-dashboard`, and `/shopper-behavior`
 
 A separate clean-clone environment was used to verify that all required files, migrations, and datasets were available and reproducible.
