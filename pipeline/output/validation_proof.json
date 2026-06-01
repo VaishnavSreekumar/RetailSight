@@ -1,8 +1,8 @@
 {
-  "proof_generated_at": "2026-06-01T11:52:32.378369+00:00",
+  "proof_generated_at": "2026-06-01T12:29:17.670935+00:00",
   "store_id": "STORE_VAL_01",
   "camera_id": "CAM_ENTRY_01",
-  "video_file": "C:\\Users\\vaish\\retail-intelligence\\CCTV Footage\\CAM 1.mp4",
+  "video_file": "/app/CCTV Footage/CAM 1.mp4",
   "frames_processed": 4193,
   "step_1_video_to_events": {
     "description": "Real YOLOv8n tracker ran on actual MP4 frames. EventGenerator state machine converted tracks to events.",
@@ -19,8 +19,8 @@
   "step_2_events_ingested": {
     "description": "POST /api/v1/events/ingest",
     "api_response": {
-      "ingested_count": 300,
-      "duplicate_count": 36,
+      "ingested_count": 336,
+      "duplicate_count": 0,
       "failed_count": 0,
       "errors": []
     }
@@ -28,29 +28,29 @@
   "step_3_sessions_hydrated": {
     "description": "POST /api/v1/stores/{store_id}/hydrate \u2014 SessionHydrationService aggregates events into VisitorSession rows.",
     "api_response": {
-      "hydrated_count": 133,
+      "hydrated_count": 68,
       "linked_count": 0
     }
   },
   "step_4_dashboard_metrics": {
     "description": "GET /api/v1/stores/{store_id}/metrics \u2014 All counts sourced from visitor_sessions table.",
-    "formula_visitor_count": "SELECT COUNT(*) FROM visitor_sessions WHERE store_id = :store_id",
-    "formula_purchase_count": "SELECT COUNT(*) FROM visitor_sessions WHERE store_id = :store_id AND has_converted = TRUE",
-    "formula_queue_entries": "SELECT COUNT(*) FROM visitor_sessions WHERE store_id = :store_id AND has_joined_billing_queue = TRUE",
+    "formula_visitor_count": "SELECT COUNT(1) FROM visitor_session WHERE store_id = :store_id",
+    "formula_purchase_count": "SELECT COUNT(1) FROM visitor_session WHERE store_id = :store_id AND has_converted = TRUE",
+    "formula_queue_entries": "SELECT COUNT(1) FROM visitor_session WHERE store_id = :store_id AND has_joined_billing_queue = TRUE",
     "formula_conversion_rate": "(purchase_count / visitor_count) * 100  \u2192 percentage [0, 100]",
     "formula_abandonment_rate": "((queue_entries - purchases) / queue_entries)  \u2192 fraction [0, 1]",
     "live_metrics": {
       "store_id": "STORE_VAL_01",
-      "visitors": 133,
-      "engaged_visitors": 86,
+      "visitors": 68,
+      "engaged_visitors": 45,
       "billing_queue_visitors": 0,
       "purchases": 0,
       "conversion_rate": 0.0,
-      "avg_session_dwell_ms": 5530.05,
-      "avg_journey_length": 0.65,
-      "avg_zones_visited": 0.65,
+      "avg_session_dwell_ms": 6582.31,
+      "avg_journey_length": 0.66,
+      "avg_zones_visited": 0.66,
       "opportunity_zones": [],
-      "generated_at": "2026-06-01T11:52:31.753027Z"
+      "generated_at": "2026-06-01T12:29:17.635995Z"
     }
   },
   "step_5_single_visitor_proof": {
@@ -233,7 +233,7 @@
       }
     ],
     "hydrated_journey": {
-      "session_id": "ed9ecd6d-cb20-4028-873c-9ba93940bd6b",
+      "session_id": "14897e59-5077-480b-a657-2d45356d16aa",
       "visitor_id": "VIS_001",
       "journey_path": [
         "SKINCARE"
@@ -252,7 +252,7 @@
   "data_source_audit": {
     "visitor_events": "REAL \u2014 YOLOv8n detection + ByteTrack tracking on actual CAM 1.mp4 video frames",
     "sessions": "REAL \u2014 derived from visitor_events by SessionHydrationService",
-    "metrics": "REAL \u2014 counted from visitor_sessions table via SQL WHERE store_id filter",
+    "metrics": "REAL \u2014 counted from visitor_session table via SQL WHERE store_id filter",
     "brigade_pos_transactions": "REAL \u2014 parsed from Brigade_Bangalore CSV file (Sprint 19)",
     "mock_data": "NONE in this validation run \u2014 e2e_verifier.py TXN_E2E_001 is isolated to its own STORE_E2E_01 store"
   }

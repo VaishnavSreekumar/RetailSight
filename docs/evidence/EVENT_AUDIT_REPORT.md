@@ -17,10 +17,10 @@ Below is a summary of database metrics showing event quality, duplicate detectio
 
 ### After Sprint 25
 
-* **Events**: 355
+* **Events**: 336
 * **Duplicate ENTRYs**: 0
 * **Duplicate ZONE_ENTERs**: 0
-* **Sessions**: 74
+* **Sessions**: 68
 
 ---
 
@@ -66,7 +66,7 @@ Here is the exact sequential event log and hydrated session for visitor `VIS_001
 ## 3. Key Achievements & Verification Details
 
 1. **Deterministic Idempotency**:
-   Running the validation pipeline consecutively twice produces exactly **355 events** in the database. The second run records **0 new event insertions** and **355 duplicate warnings** on conflict, keeping the total visitor sessions at exactly **74**.
+   Running the validation pipeline consecutively twice produces exactly **336 events** in the database. The second run records **0 new event insertions** and **336 duplicate warnings** on conflict, keeping the total visitor sessions at exactly **68**.
 2. **Generation-Level Prevention**:
    The `EventGenerator` active-track check prevents duplicate emissions of `ENTRY` and `ZONE_ENTER` events at frame time, eliminating the root cause of event bloating.
 3. **Safety-Net Hydration Filtering**:

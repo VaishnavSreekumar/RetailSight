@@ -24,7 +24,7 @@ Run the canonical validation script to process the real video footage, extract t
 # Ensure the python environment is active and run the validation pipeline
 python pipeline/run_cctv_validation.py
 ```
-*Note: This script will run YOLOv8 tracking on the real 2.3-minute video `CCTV Footage/CAM 1.mp4` (4193 frames), generate 355 events, ingest them via the API, and trigger session hydration.*
+*Note: This script will run YOLOv8 tracking on the real 2.3-minute video `CCTV Footage/CAM 1.mp4` (4193 frames), generate 336 events, ingest them via the API, and trigger session hydration.*
 
 ### Step 3: Run Verification Curl Queries
 Verify the resulting analytics using the following canonical API endpoints. The endpoints are exposed directly at the root level for immediate query accessibility without needing sub-path redirects or complex URL syntax:
@@ -104,23 +104,23 @@ E2E validation processing was executed against the raw video `CCTV Footage/CAM 1
 
 ### Pipeline Statistics
 - **Total Video Frames Processed**: 4,193 frames
-- **CCTV Event Count**: 355 raw events generated
-- **Unique Visitor IDs Tracked**: 74 unique shoppers
-- **Reconstructed Visitor Sessions**: 74 visitor sessions
+- **CCTV Event Count**: 336 raw events generated
+- **Unique Visitor IDs Tracked**: 68 unique shoppers
+- **Reconstructed Visitor Sessions**: 68 visitor sessions
 
 ### Event Breakdown by Type
 | Event Type | Generated Count | Description |
 |---|---|---|
-| **ENTRY** | 74 | Triggered when a visitor enters the camera FOV |
-| **ZONE_ENTER** | 52 | Triggered when a visitor enters the `SKINCARE` retail zone |
-| **ZONE_DWELL** | 112 | Periodic dwell events emitted every 5 seconds of active zone dwell |
-| **ZONE_EXIT** | 48 | Triggered when a visitor leaves the `SKINCARE` retail zone |
-| **EXIT** | 69 | Triggered when a visitor exits the camera FOV |
+| **ENTRY** | 68 | Triggered when a visitor enters the camera FOV |
+| **ZONE_ENTER** | 49 | Triggered when a visitor enters the `SKINCARE` retail zone |
+| **ZONE_DWELL** | 111 | Periodic dwell events emitted every 5 seconds of active zone dwell |
+| **ZONE_EXIT** | 45 | Triggered when a visitor leaves the `SKINCARE` retail zone |
+| **EXIT** | 63 | Triggered when a visitor exits the camera FOV |
 
 ### Reconstructed Session Metrics (STORE_VAL_01)
-- **Total Visitors**: 74
-- **Engaged Visitors (Entered Skincare)**: 49
-- **Average Session Dwell Time**: 6.14 seconds (6,140.40 ms)
+- **Total Visitors**: 68
+- **Engaged Visitors (Entered Skincare)**: 45
+- **Average Session Dwell Time**: 6.58 seconds (6,582.31 ms)
 - **Average Zones Visited**: 0.66
 - **Average Journey Length**: 0.66
 
@@ -143,14 +143,14 @@ event_id = uuid.uuid5(
 ```
 
 ### Ingestion Response Evidence
-Running the ingestion API twice against the 355 events extracted from `CAM 1.mp4`:
-- **First Ingestion Run**: `ingested_count: 355`, `duplicate_count: 0`, `failed_count: 0`
-- **Second Ingestion Run**: `ingested_count: 0`, `duplicate_count: 355`, `failed_count: 0` (All duplicates rejected at the DB layer via unique index constraint `ix_event_event_id`).
+Running the ingestion API twice against the 336 events extracted from `CAM 1.mp4`:
+- **First Ingestion Run**: `ingested_count: 336`, `duplicate_count: 0`, `failed_count: 0`
+- **Second Ingestion Run**: `ingested_count: 0`, `duplicate_count: 336`, `failed_count: 0` (All duplicates rejected at the DB layer via unique index constraint `ix_event_event_id`).
 
 ### Session-Level Deduplication
 Re-running `SessionHydrator` safety-net queries does not duplicate visitor sessions:
-- **First Hydration Run**: Hydrated 74 sessions from 355 events.
-- **Second Hydration Run**: Hydrated 74 sessions, linked 0 transactions. Session counts remain at exactly 74.
+- **First Hydration Run**: Hydrated 68 sessions from 336 events.
+- **Second Hydration Run**: Hydrated 68 sessions, linked 0 transactions. Session counts remain at exactly 68.
 
 ---
 
@@ -249,8 +249,8 @@ docker compose exec web python pipeline/run_cctv_validation.py
 
 The validation produced:
 
-* 355 generated events
-* 74 hydrated visitor sessions
+* 336 generated events
+* 68 hydrated visitor sessions
 * Successful API responses from `/metrics`, `/executive-dashboard`, and `/shopper-behavior`
 
 A separate clean-clone environment was used to verify that all required files, migrations, and datasets were available and reproducible.

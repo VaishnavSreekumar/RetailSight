@@ -34,9 +34,9 @@ This script runs YOLOv8 tracking on the real CCTV footage (`CCTV Footage/CAM 1.m
 
 * **Expected Clean-Run Validation Results**:
   * Frames Processed: 4193
-  * Events Generated: 355
-  * Unique Visitors: 74
-  * Sessions Hydrated: 74
+  * Events Generated: 336
+  * Unique Visitors: 68
+  * Sessions Hydrated: 68
 
 ### Step 5: Start the API Application Server
 Before calling the APIs, ensure the FastAPI server is running:
@@ -63,12 +63,12 @@ curl http://127.0.0.1:8000/executive-dashboard
 ```json
 {
   "store_id": "STORE_VAL_01",
-  "visitors": 74,
-  "engaged_visitors": 49,
+  "visitors": 68,
+  "engaged_visitors": 45,
   "billing_queue_visitors": 0,
   "purchases": 0,
   "conversion_rate": 0.0,
-  "avg_session_dwell_ms": 6140.4
+  "avg_session_dwell_ms": 6582.31
 }
 ```
 
@@ -189,7 +189,7 @@ The validation pipeline output and dashboard responses can be visually reviewed 
 - [ ] Docker containers running (`docker compose ps` shows `retail_intel_db` and `retail_intel_api` running)
 - [ ] Database migrations applied successfully
 - [ ] Brigade transaction dataset loaded successfully (101 items, INR 34,831.74 total revenue)
-- [ ] CCTV validation completed (processed 4193 frames → 355 events)
-- [ ] `/metrics` endpoint responding with 74 visitors
+- [ ] CCTV validation completed (processed 4193 frames → 336 events)
+- [ ] `/metrics` endpoint responding with 68 visitors
 - [ ] `/shopper-behavior` endpoint responding with engagement dwell times
 - [ ] `/executive-dashboard` endpoint responding with NMV breakdown matching loaded POS dataset

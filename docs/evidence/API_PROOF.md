@@ -12,16 +12,16 @@ Generated from clean-clone Docker deployment validation on 2026-06-01.
 ```json
 {
   "store_id": "STORE_VAL_01",
-  "visitors": 74,
-  "engaged_visitors": 49,
+  "visitors": 68,
+  "engaged_visitors": 45,
   "billing_queue_visitors": 0,
   "purchases": 0,
   "conversion_rate": 0.0,
-  "avg_session_dwell_ms": 6140.4,
+  "avg_session_dwell_ms": 6582.31,
   "avg_journey_length": 0.66,
   "avg_zones_visited": 0.66,
   "opportunity_zones": [],
-  "generated_at": "2026-06-01T08:13:13.488742+00:00"
+  "generated_at": "2026-06-01T12:29:17.635995Z"
 }
 ```
 
@@ -139,10 +139,17 @@ Generated from clean-clone Docker deployment validation on 2026-06-01.
 {
   "sections": [
     {
-      "section_name": "CENTRAL_DISPLAY",
+      "section_name": "SKINCARE_WALL",
+      "visitor_count": 45,
+      "avg_dwell_seconds": 8.58,
+      "purchase_count": 12,
+      "conversion_rate": 0.26666666666666666
+    },
+    {
+      "section_name": "PMU_SECTION",
       "visitor_count": 0,
       "avg_dwell_seconds": 0.0,
-      "purchase_count": 5,
+      "purchase_count": 3,
       "conversion_rate": 0.0
     },
     {
@@ -153,17 +160,10 @@ Generated from clean-clone Docker deployment validation on 2026-06-01.
       "conversion_rate": 0.0
     },
     {
-      "section_name": "SKINCARE_WALL",
-      "visitor_count": 49,
-      "avg_dwell_seconds": 7.68,
-      "purchase_count": 12,
-      "conversion_rate": 0.24489795918367346
-    },
-    {
-      "section_name": "PMU_SECTION",
+      "section_name": "CENTRAL_DISPLAY",
       "visitor_count": 0,
       "avg_dwell_seconds": 0.0,
-      "purchase_count": 3,
+      "purchase_count": 5,
       "conversion_rate": 0.0
     }
   ],

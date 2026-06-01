@@ -386,8 +386,8 @@ docker compose exec web python pipeline/run_cctv_validation.py
 
 The validation produced:
 
-* 355 generated events (355 events successfully ingested, 0 duplicates on first clean run)
-* 74 hydrated visitor sessions (perfectly matching the 74 unique visitors detected)
+* 336 generated events (336 events successfully ingested, 0 duplicates on first clean run)
+* 68 hydrated visitor sessions (perfectly matching the 68 unique visitors detected)
 * Successful API responses from `/metrics`, `/executive-dashboard`, and `/shopper-behavior`
 
 A separate clean-clone environment was used to verify that all required files, migrations, and datasets were available and reproducible.
