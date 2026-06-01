@@ -88,7 +88,7 @@ The platform is divided into two decoupled subsystems:
 * **PostgreSQL (JSONB)**: Stores events, transactions, and session paths. JSONB columns preserve semi-structured tracking metadata.
 * **Transaction Matcher**: Attributes checkout transactions to visitor sessions based on queue-join indicators and time proximity.
 
-For a detailed view of the system diagrams, refer to [DESIGN.md](./DESIGN.md) and [ADR.md](./ADR.md).
+For a detailed view of the system diagrams, refer to [ARCHITECTURE.md](./ARCHITECTURE.md) and [CHOICES.md](./CHOICES.md).
 
 ---
 
@@ -320,22 +320,31 @@ $env:PYTHONPATH="."
 
 The Brigade Road store layout was mapped into business sections and linked to CCTV visitor journeys and POS transactions.
 
-![Store Layout Intelligence](docs/layout_assets/brigade_layout_intelligence.png)
+![Store Layout Intelligence](docs/layout/brigade_layout_intelligence.png)
 
 ---
 
 ## 9. System Screenshots
 
 ### CCTV End-to-End Ingestion & Hydration Execution
-![Validation Run Output](docs/screenshots/validation_run.png)
+![Validation Run Output](docs/evidence/screenshots/validation_run.png)
 
 ### Shopper Analytics Dashboard Mockups
-![Shopper Behavior Analytics](docs/screenshots/shopper_behavior_dashboard.png)
-![Executive Dashboard Metrics](docs/screenshots/executive_dashboard.png)
+![Shopper Behavior Analytics](docs/evidence/screenshots/shopper_behavior_dashboard.png)
+![Executive Dashboard Metrics](docs/evidence/screenshots/executive_dashboard.png)
 
 ---
 
-## 10. OpenCV Deployment Strategy
+## 10. Additional Validation Evidence
+
+The following documents capture secondary validation evidence, API outputs, and detailed financial reconciliations:
+* **API Validation Proof**: [API_PROOF.md](docs/evidence/API_PROOF.md) verifies REST response integrity and lists complete JSON schema responses.
+* **Event Ingestion Audit**: [EVENT_AUDIT_REPORT.md](docs/evidence/EVENT_AUDIT_REPORT.md) logs raw telemetry transaction integrity.
+* **Revenue Reconciliation**: [SECTION_RECONCILIATION.md](docs/evidence/SECTION_RECONCILIATION.md) matches physical store coordinates to the Brigade POS transaction revenue.
+
+---
+
+## 11. OpenCV Deployment Strategy
 
 * **Problem**: Running YOLOv8 inside Docker containers without GUI/X11 dependencies on lightweight Linux servers.
 * **Options Considered**:
@@ -347,7 +356,7 @@ The Brigade Road store layout was mapped into business sections and linked to CC
 
 ---
 
-## 11. Known Limitations & Future Enhancements
+## 12. Known Limitations & Future Enhancements
 
 * **Deterministic Cross-Camera Correlation**:
   * *Limitation*: Can confuse different tracks if multiple exits and entrances occur inside the same 5-second window.
@@ -361,7 +370,7 @@ The Brigade Road store layout was mapped into business sections and linked to CC
 
 ---
 
-## 12. Reproducibility Verification
+## 13. Reproducibility Verification
 
 The project was validated from a fresh Git clone in a separate workspace.
 
@@ -385,7 +394,7 @@ A separate clean-clone environment was used to verify that all required files, m
 
 ---
 
-## 13. Architectural Principles
+## 14. Architectural Principles
 
 The system was designed around five core pillars:
 
@@ -394,6 +403,3 @@ The system was designed around five core pillars:
 3. **Reproducible Docker Deployment**: All service environments, system library packages, and database parameters are containerized to eliminate "works on my machine" failures.
 4. **Privacy-Preserving Shopper Analytics**: Visual streams are processed entirely at the edge, converting pixel data into coordinates and telemetry events. No biometric or face signatures are persisted.
 5. **Decoupled Event Ingestion and Session Reconstruction**: The telemetry capture API is decoupled from session logic, allowing high-throughput ingestion and asynchronous processing.
-
-
-

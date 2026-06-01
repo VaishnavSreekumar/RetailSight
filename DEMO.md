@@ -176,11 +176,11 @@ curl http://127.0.0.1:8000/api/v1/stores/STORE_VAL_01/correlations
 
 ## 4. Visual Layout & Analytics Screenshots
 
-The validation pipeline output and dashboard responses can be visually reviewed using the screenshots stored under [docs/screenshots/](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/):
+The validation pipeline output and dashboard responses can be visually reviewed using the screenshots stored under [docs/evidence/screenshots/](file:///c:/Users/vaish/retail-intelligence/docs/evidence/screenshots/):
 
-* **Validation Run Execution**: [validation_run.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/validation_run.png) shows the console output of the YOLOv8 validation script processing 4,193 frames.
-* **Shopper Analytics Dashboard**: [shopper_behavior_dashboard.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/shopper_behavior_dashboard.png) shows the shopper behavior correlation dashboard.
-* **Executive Performance Dashboard**: [executive_dashboard.png](file:///c:/Users/vaish/retail-intelligence/docs/screenshots/executive_dashboard.png) shows layout section sales, ABV, and conversion trends.
+* **Validation Run Execution**: [validation_run.png](file:///c:/Users/vaish/retail-intelligence/docs/evidence/screenshots/validation_run.png) shows the console output of the YOLOv8 validation script processing 4,193 frames.
+* **Shopper Analytics Dashboard**: [shopper_behavior_dashboard.png](file:///c:/Users/vaish/retail-intelligence/docs/evidence/screenshots/shopper_behavior_dashboard.png) shows the shopper behavior correlation dashboard.
+* **Executive Performance Dashboard**: [executive_dashboard.png](file:///c:/Users/vaish/retail-intelligence/docs/evidence/screenshots/executive_dashboard.png) shows layout section sales, ABV, and conversion trends.
 
 ---
 

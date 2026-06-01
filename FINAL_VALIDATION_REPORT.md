@@ -76,7 +76,7 @@ graph TD
 ### Visual Layout & Camera Coverage
 The physical floor plan mapping and tracking coverage of `CAM 1` and `CAM 4` are outlined below:
 
-![Store Layout Floorplan](file:///c:/Users/vaish/retail-intelligence/docs/layout_assets/store_layout.png)
+![Store Layout Floorplan](file:///c:/Users/vaish/retail-intelligence/docs/layout/brigade_layout_intelligence.png)
 
 ---
 
@@ -172,7 +172,7 @@ Layout analysis maps the physical floor plan zones to distinct retail sections d
 ### Live Executive Analytics Mockup
 The analytics generated from the real Brigade dataset are rendered in the dashboard mockup below:
 
-![Executive Dashboard Analytics Mockup](file:///c:/Users/vaish/retail-intelligence/docs/layout_assets/dashboard_mockup.png)
+![Executive Dashboard Analytics Mockup](file:///c:/Users/vaish/retail-intelligence/docs/layout/dashboard_mockup.png)
 
 ---
 

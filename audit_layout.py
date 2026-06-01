@@ -5,7 +5,7 @@ import os
 
 # Define the path to the Excel file
 LAYOUT_FILE_PATH = os.path.join(os.path.dirname(__file__), 'Brigade Road - Store layoutc5f5d56.xlsx')
-ASSETS_DIR = os.path.join(os.path.dirname(__file__), 'docs', 'layout_assets')
+ASSETS_DIR = os.path.join(os.path.dirname(__file__), 'docs', 'layout')
 
 def audit_layout_workbook():
     """
