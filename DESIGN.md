@@ -2,7 +2,7 @@
 
 This document provides a high-level overview of the **RetailSight Commerce & CCTV Intelligence Platform** system design, repository structure, architectural layout, and AI collaborations. It is structured to help a reviewer understand the engineering layout in under 2 minutes.
 
-For low-level implementation details, code models, and schemas, refer to [ARCHITECTURE.md](file:///c:/Users/vaish/retail-intelligence/ARCHITECTURE.md). For engineering choices, options considered, and tradeoffs, refer to [CHOICES.md](file:///c:/Users/vaish/retail-intelligence/CHOICES.md).
+For low-level implementation details, code models, and schemas, refer to [ARCHITECTURE.md](./ARCHITECTURE.md). For engineering choices, options considered, and tradeoffs, refer to [CHOICES.md](./CHOICES.md).
 
 ---
 
@@ -55,7 +55,7 @@ graph TD
 4.  **Analytics Hydration (Backend)**: Shopper sessions are hydrated from raw event sequences, filtered to exclude store staff, and temporally mapped to POS receipts using queue-join indicators.
 5.  **Analytics Serving (API)**: Structured APIs expose metrics, funnel cohorts, and operational alerts to executive dashboards.
 
-*Note: For the detailed relational model attributes and complete endpoint JSON schemas, refer to [ARCHITECTURE.md](file:///c:/Users/vaish/retail-intelligence/ARCHITECTURE.md#l172).*
+*Note: For the detailed relational model attributes and complete endpoint JSON schemas, refer to [ARCHITECTURE.md](./ARCHITECTURE.md#6-database-schema-design).*
 
 ---
 
@@ -115,7 +115,7 @@ LLMs were leveraged as collaborative pair programmers to accelerate development.
 | **Ingestion Schema** | Loose type checking on ingestion endpoints to maximize speed. | Enforced strict Pydantic regex validators (`STORE_VAL_[0-9]+`, `VIS_G[0-9]+`). | Blocks corrupt tracking inputs from entering the analytical engine. |
 | **Staff Handling** | Uniform color classification models in the video pipeline. | Enforced database compliance schema (propagating `is_staff: bool`) with backend filtering. | Speculative vision heuristics cause false confidence. Clean schema-based filtering ensures 100% correct metrics. |
 
-For detailed documentation of these design choices, refer to [CHOICES.md](file:///c:/Users/vaish/retail-intelligence/CHOICES.md) and Section 9 of [ARCHITECTURE.md](file:///c:/Users/vaish/retail-intelligence/ARCHITECTURE.md#L243).
+For detailed documentation of these design choices, refer to [CHOICES.md](./CHOICES.md) and Section 9 of [ARCHITECTURE.md](./ARCHITECTURE.md#9-ai-assisted-decisions).
 
 ---
 
@@ -123,14 +123,14 @@ For detailed documentation of these design choices, refer to [CHOICES.md](file:/
 
 The mapping of the physical floor plan coordinate boundaries (Entry/Exit corridor, Makeup wall, Skincare wall, Billing counters) and the resulting Shopper Performance Mockups are stored under `docs/`:
 
-*   **Store Floor Plan Coordinate Grid**: [brigade_layout_intelligence.png](file:///c:/Users/vaish/retail-intelligence/docs/layout/brigade_layout_intelligence.png) shows camera layout fields of view.
-*   **Executive Dashboard Mockups**: [dashboard_mockup.png](file:///c:/Users/vaish/retail-intelligence/docs/layout/dashboard_mockup.png) renders store section conversions.
+*   **Store Floor Plan Coordinate Grid**: [brigade_layout_intelligence.png](./docs/layout/brigade_layout_intelligence.png) shows camera layout fields of view.
+*   **Executive Dashboard Mockups**: [dashboard_mockup.png](./docs/layout/dashboard_mockup.png) renders store section conversions.
 
 ---
 
 ## 7. Direct Technical References
 
 Reviewers looking for technical deep-dives should navigate to:
-*   **Database Schema & Data Flow**: [ARCHITECTURE.md (Sections 3 & 6)](file:///c:/Users/vaish/retail-intelligence/ARCHITECTURE.md#L62).
-*   **YOLO & ByteTrack Tradeoffs**: [CHOICES.md (Sections 1 & 2)](file:///c:/Users/vaish/retail-intelligence/CHOICES.md#L7).
-*   **Reconciliation & Proofs**: [FINAL_VALIDATION_REPORT.md](file:///c:/Users/vaish/retail-intelligence/FINAL_VALIDATION_REPORT.md).
+*   **Database Schema & Data Flow**: [ARCHITECTURE.md](./ARCHITECTURE.md) (specifically [Section 3: Data Flow Lifecycle](./ARCHITECTURE.md#3-data-flow-lifecycle) & [Section 6: Database Schema Design](./ARCHITECTURE.md#6-database-schema-design)).
+*   **YOLO & ByteTrack Tradeoffs**: [CHOICES.md](./CHOICES.md) (specifically [Section 1: Object Detection Model: YOLOv8](./CHOICES.md#1-object-detection-model-yolov8) & [Section 2: Tracking Framework: Built-in ByteTrack](./CHOICES.md#2-tracking-framework-built-in-bytetrack)).
+*   **Reconciliation & Proofs**: [FINAL_VALIDATION_REPORT.md](./FINAL_VALIDATION_REPORT.md).
